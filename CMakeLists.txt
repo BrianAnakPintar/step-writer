@@ -14,7 +14,7 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(ftxui)
 
-add_executable(step-writer src/main.cpp src/editor.cpp src/editor.cpp src/document.cpp src/TextFileViewer.cpp)
+add_executable(step-writer src/main.cpp src/Editor.cpp src/editor.cpp src/document.cpp src/TextFileViewer.cpp)
 target_link_libraries(step-writer PRIVATE ftxui::screen
                                   PRIVATE ftxui::dom
                                   PRIVATE ftxui::component)

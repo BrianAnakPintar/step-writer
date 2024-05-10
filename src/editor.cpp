@@ -1,14 +1,16 @@
-#include "../include/editor.h"
+#include "../include/Editor.h"
 #include "../include/TextFileViewer.h"
 
+/* REFACTORING | Planned Things.
 
-Editor::Editor() {
-    StartMenuUI();
-}
+1. Convert the Editor into a Singleton which should also contain various variable declarations.
 
-Editor::Editor(const std::string &path) {
-    StartMenuUI();
-}
+2. Refactor Duplicate Code. Create Clean and Nice to read code Especially for UI stuff.
+
+3. Make shit look nice.
+
+*/
+
 
 // Similar to the `ls` command that outputs all files in a directory. 
 // It takes a path string, and outputs a vector of strings of all files in the path.
@@ -42,13 +44,23 @@ void Editor::OpenFile(std::vector<std::string> files, int idx) {
         fileContent.push_back(line);
     }
     file.close();
-    screen.ExitLoopClosure();
-    auto viewer = ftxui::Make<TextFileViewer>(fileName);
+
+    auto tfv = ftxui::Make<TextFileViewer>(fileName);
+    auto viewer = ftxui::Renderer([&](bool focused) {
+        if (focused) {
+            return tfv->Render();
+        }
+        else
+            return ftxui::text(" Focusable renderer() ");
+    });
+
+    viewer |= ftxui::CatchEvent([&](ftxui::Event event) {
+        return tfv->HandleInput(event);
+    });
+
     mainScreen = viewer;
-    int left_size = 20;
-    mainScreen = ResizableSplitLeft(explorer, mainScreen, &left_size);
-    auto renderer = ftxui::Renderer(mainScreen, [&] { return mainScreen->Render() | ftxui::border; });
-    screen.Loop(renderer);
+
+    ScreenHelper(mainScreen);
 }
 
 // Gets the current directory and lists all item.
@@ -59,7 +71,6 @@ void Editor::LoadCurrFolder() {
     std::vector<std::string> items = ListFiles(currentDirectory);
     int selected = 0;
 
-    screen.ExitLoopClosure();
     ftxui::MenuOption option;
     option.on_enter = [&] { OpenFile(items, selected); };
     explorer = ftxui::Menu(&items, &selected, option);
@@ -67,11 +78,7 @@ void Editor::LoadCurrFolder() {
     auto middle = ftxui::Renderer([&] {return ftxui::vbox({
             ftxui::text(msg),
         }) | ftxui::center;} );
-    int left_size = 20;
-    mainScreen = middle;
-    mainScreen = ResizableSplitLeft(explorer, mainScreen, &left_size);
-    auto renderer = ftxui::Renderer(mainScreen, [&] { return mainScreen->Render() | ftxui::border; });
-    screen.Loop(renderer);
+    ScreenHelper(middle);
 }
 
 void Editor::StartMenuUI() {
@@ -83,9 +90,38 @@ void Editor::StartMenuUI() {
     }) | ftxui::center;} );
 
     explorer = button;
+    ScreenHelper(middle);
+}
+
+void Editor::ScreenHelper(ftxui::Component middle) {
     int left_size = 20;
     mainScreen = middle;
     mainScreen = ResizableSplitLeft(explorer, mainScreen, &left_size);
+
+    screen.Clear();
     auto renderer = ftxui::Renderer(mainScreen, [&] { return mainScreen->Render() | ftxui::border; });
+
+    renderer |= ftxui::CatchEvent([&](ftxui::Event event) {
+        return SanityChecks(event);
+    });
+
     screen.Loop(renderer);
+}
+
+Editor& Editor::GetInstance() {
+    static Editor instance;
+    return instance;
+}
+
+void Editor::OpenFileEditor(const std::string &path) {
+    StartMenuUI();
+}
+
+bool Editor::SanityChecks(ftxui::Event event) {
+    if (event == ftxui::Event::Character('q')) {
+        screen.Exit();
+        return true;
+    }
+
+    return false;
 }
