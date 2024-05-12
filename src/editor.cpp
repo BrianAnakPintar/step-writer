@@ -92,10 +92,8 @@ void Editor::StartMenuUI() {
     explorer = button;
     ScreenHelper(middle);
 }
-
 void Editor::ScreenHelper(ftxui::Component middle) {
-    int left_size = 20;
-    mainScreen = middle;
+    mainScreen = middle; 
     mainScreen = ResizableSplitLeft(explorer, mainScreen, &left_size);
 
     screen.Clear();
@@ -113,13 +111,17 @@ Editor& Editor::GetInstance() {
     return instance;
 }
 
+ftxui::ScreenInteractive& Editor::GetScreen() {
+    return screen;
+}
+
 void Editor::OpenFileEditor(const std::string &path) {
     StartMenuUI();
 }
 
 bool Editor::SanityChecks(ftxui::Event event) {
     if (event == ftxui::Event::Character('q')) {
-        screen.Exit();
+        screen.ExitLoopClosure();
         return true;
     }
 

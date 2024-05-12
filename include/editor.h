@@ -43,9 +43,11 @@ public:
     Editor(const Editor&) = delete;
     void operator=(const Editor&) = delete;
     static Editor& GetInstance();
+    ftxui::ScreenInteractive& GetScreen();
 
     // Variables
     bool quitSignal;
+    int left_size = 20;
 };
 
 #endif
