@@ -7,90 +7,103 @@ TextFileViewer::TextFileViewer(const std::string& file_path) : file_path_(file_p
     Editor& editor = Editor::GetInstance();
     cursorX = editor.left_size + 1;
     cursorY = 0;
-    LoadFile();
+    document = Document(file_path);
 }
 
 ftx::Element TextFileViewer::Render() {
     using namespace ftx;
     Elements elements;
-    elements.push_back(text(L"Cursor Position: (" + std::to_wstring(cursorX) + L", " + std::to_wstring(cursorY) + L")"));
-    elements.push_back(text(s));
-    int max_number_length = std::to_string(file_content_.size()).size(); // Get the length of the longest line number.
 
-    for (int i = 0; i < file_content_.size(); i++) {
+
+    int max_number_length = std::to_string(document.GetRowsLength()).size(); // Get the length of the longest line number.
+    numPadding = max_number_length;
+
+    int viewportEnd = std::min(viewportStart_ + Editor::GetInstance().GetScreen().dimy() - 2, static_cast<int>(document.GetRowsLength()));
+
+    for (int i = viewportStart_; i < viewportEnd; i++) {
         auto line_number = std::to_wstring(i+1);
         std::wstring padded_number = std::wstring(max_number_length - line_number.size(), L' ') + line_number;
         auto line_elem = hbox(
             text(padded_number + L"  ") | color(Color::Blue) | dim,
-            text(file_content_[i])
+            text(document.GetRows()[i])
         );
         elements.push_back(line_elem);
     }
     
 
-    return vbox(elements) | vscroll_indicator | frame;
-}
-
-void TextFileViewer::LoadFile() {
-    std::ifstream file(file_path_);
-    if (file.is_open()) {
-        std::string line;
-        while (std::getline(file, line)) {
-            file_content_.push_back(line);
-        }
-        file.close();
-    } else {
-        file_content_.push_back("Failed to open file: " + file_path_);
-    }
+    return vbox(elements) | frame;
 }
 
 bool TextFileViewer::HandleInput(ftxui::Event event) {
-    auto& editor = Editor::GetInstance();
-
     if (event == ftxui::Event::Character('h')) {
         cursorX -= 1;
-        ftxui::Screen::Cursor cursor;
-        cursor.x = cursorX;
-        cursor.y = cursorY;
-
-        cursor.shape = ftxui::Screen::Cursor::Shape::Block;
-
-        editor.GetScreen().SetCursor(cursor);
+        UpdateCursor();
         return true;
     }
     if (event == ftxui::Event::Character('l')) {
         cursorX += 1;
-        ftxui::Screen::Cursor cursor;
-        cursor.x = cursorX;
-        cursor.y = cursorY;
-
-        cursor.shape = ftxui::Screen::Cursor::Shape::Block;
-        editor.GetScreen().SetCursor(cursor);
-
+        UpdateCursor();
         return true;
     }
     if (event == ftxui::Event::Character('j')) {
         cursorY += 1;
-        ftxui::Screen::Cursor cursor;
-        cursor.x = cursorX;
-        cursor.y = cursorY;
-
-        cursor.shape = ftxui::Screen::Cursor::Shape::Block;
-        editor.GetScreen().SetCursor(cursor);
-
+        UpdateCursor();
         return true;
     }
     if (event == ftxui::Event::Character('k')) {
         cursorY -= 1;
-        ftxui::Screen::Cursor cursor;
-        cursor.x = cursorX;
-        cursor.y = cursorY;
-
-        cursor.shape = ftxui::Screen::Cursor::Shape::Block;
-        editor.GetScreen().SetCursor(cursor);
-
+        UpdateCursor();
         return true;
     }
 
+    UpdateCursor();
     return false;
+}
+
+void TextFileViewer::UpdateCursor() {
+    ftxui::Screen::Cursor cursor;
+    auto& editor = Editor::GetInstance();
+
+    // Bounds Checking to ensure that the cursor is at the appropriate place.
+    if (cursorX <= editor.left_size + numPadding + 2) {
+        cursorX = editor.left_size + numPadding + 3;
+    } else if (cursorX >= editor.GetScreen().dimx()) {
+        cursorX = editor.GetScreen().dimx() - 1;
+    } else if (cursorY <= 0) {
+        cursorY = 1;
+        ScrollUp();
+    } else if (cursorY >= editor.GetScreen().dimy()) {
+        cursorY = editor.GetScreen().dimy() - 1;
+        ScrollDown();
+    }
+
+    if (editor.focusY <= 0)
+        editor.focusY = 0;
+    if (editor.focusX <= 0)
+        editor.focusX = 0;
+
+    cursor.x = cursorX;
+    cursor.y = cursorY;
+
+    cursor.shape = ftxui::Screen::Cursor::Shape::Block;
+
+    editor.GetScreen().SetCursor(cursor);
+}
+
+void TextFileViewer::ScrollDown() {
+    // Increment the viewport start to scroll down
+    viewportStart_++;
+    // Limit the viewport start to prevent scrolling past the end of the file
+    if (viewportStart_ > static_cast<int>(document.GetRowsLength()) - Editor::GetInstance().GetScreen().dimy() + 2) {
+        viewportStart_ = static_cast<int>(document.GetRowsLength()) - Editor::GetInstance().GetScreen().dimy() + 2;
+    }
+}
+
+void TextFileViewer::ScrollUp() {
+    // Decrement the viewport start to scroll up
+    viewportStart_--;
+    // Limit the viewport start to prevent scrolling past the beginning of the file
+    if (viewportStart_ < 0) {
+        viewportStart_ = 0;
+    }
 }

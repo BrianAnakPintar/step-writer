@@ -2,9 +2,9 @@
 #define EDITOR_H
 
 #include <string>
-#include "document.h"
 #include <dirent.h>
 #include <unistd.h>
+#include <iostream>
 #include <fstream>
 
 #include "ftxui/component/captured_mouse.hpp"
@@ -13,16 +13,20 @@
 #include "ftxui/component/screen_interactive.hpp"
 #include "ftxui/dom/elements.hpp"
 
-
 class Editor {
-    
 private:
     // Private Vars
     static Editor instance;
-    static std::mutex mutex;
+    enum EditorState {
+        MainMenu,
+        Workspace,
+        Settings
+    };
+    EditorState editorState;
+    int editorStateInt; // Redundant but lets just see if it works.
+
     Editor() {}
 
-    Document document;
     ftxui::ScreenInteractive screen = ftxui::ScreenInteractive::Fullscreen();
     ftxui::Component explorer;
     ftxui::Component mainScreen;
@@ -31,14 +35,21 @@ private:
     void LoadCurrFolder();
     std::vector<std::string> ListFiles(const std::string& path);
     void StartMenuUI();
-    void OpenFile(std::vector<std::string> files, int idx);
+    void OpenFile(std::vector<std::string> files, int idx, std::string& base_path);
     void ScreenHelper(ftxui::Component);
 
     bool SanityChecks(ftxui::Event event);
 
+    void HomeButton(int type);
+    ftxui::Component buttonsHelper(ftxui::Component &menu, ftxui::Component &workspace, ftxui::Component &settings);
+
 public:
     // Opens a file/folder in the editor.
     void OpenFileEditor(const std::string &path);
+
+    // The first function called, the point of entry.
+    void StartApplication();
+
     // Constructor for an empty project.
     Editor(const Editor&) = delete;
     void operator=(const Editor&) = delete;
@@ -48,6 +59,8 @@ public:
     // Variables
     bool quitSignal;
     int left_size = 20;
+
+    int focusX, focusY;
 };
 
 #endif
