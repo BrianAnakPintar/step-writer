@@ -6,14 +6,25 @@
 TextFileViewer::TextFileViewer(const std::string& file_path) : file_path_(file_path) {
     Editor& editor = Editor::GetInstance();
     cursorX = editor.left_size + 1;
-    cursorY = 0;
+    cursorY = 1;
+    viewportStart_ = 0;
     document = Document(file_path);
+}
+
+bool TextFileViewer::UpdateDocument(const std::string& path) {
+    file_path_ = path;
+    Editor& editor = Editor::GetInstance();
+    cursorX = editor.left_size + 1;
+    cursorY = 1;
+    viewportStart_ = 0;
+    document = Document(path);
+    // TODO: We have to add a Fallback/Failure when Document does not successfully open a file.
+    return true;
 }
 
 ftx::Element TextFileViewer::Render() {
     using namespace ftx;
     Elements elements;
-
 
     int max_number_length = std::to_string(document.GetRowsLength()).size(); // Get the length of the longest line number.
     numPadding = max_number_length;
@@ -65,7 +76,7 @@ void TextFileViewer::UpdateCursor() {
     auto& editor = Editor::GetInstance();
 
     // Bounds Checking to ensure that the cursor is at the appropriate place.
-    if (cursorX <= editor.left_size + numPadding + 2) {
+    if (cursorX < editor.left_size + numPadding + 3) {
         cursorX = editor.left_size + numPadding + 3;
     } else if (cursorX >= editor.GetScreen().dimx()) {
         cursorX = editor.GetScreen().dimx() - 1;

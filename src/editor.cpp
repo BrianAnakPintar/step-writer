@@ -1,12 +1,18 @@
 #include "../include/Editor.h"
-#include "../include/TextFileViewer.h"
 #include "../include/Utils.h"
 
-/* REFACTORING | Planned Things.
+/* REFACTORING | Notes for later.
 
-2. Refactor Duplicate Code. Create Clean and Nice to read code Especially for UI stuff.
+I am planning to make things work for now.
+The design in which I am making and writing these things is horrible.
 
-3. Make shit look nice.
+Ideally, we would use the MVC pattern where we split our program into
+2 parts, the UI and the main functionality. This would greatly enhance our code!
+Additionally, I would also advise myself to add unit tests ASAP. The longer I delay,
+the more I might regret this ;-;
+
+Next, there are lots of redundant code here with unused function, try to get rid of them.
+Also use proper function calls where necessary.
 
 */
 
@@ -30,36 +36,7 @@ std::string msg = "Use the button the left to open";
 
 void Editor::OpenFile(std::vector<std::string> files, int idx, std::string& base_path) {
     std::string fileName = base_path + "/" + files[idx];
-
-    std::ifstream file(fileName);
-    if (!file.is_open()) {
-        msg = "Error Opening File. Try Again";
-        return;
-    }
-
-    std::vector<std::string> fileContent;
-    std::string line;
-    while (std::getline(file, line)) {
-        fileContent.push_back(line);
-    }
-    file.close();
-
-    auto tfv = ftxui::Make<TextFileViewer>(fileName);
-    auto viewer = ftxui::Renderer([&](bool focused) {
-        if (focused) {
-            return tfv->Render();
-        }
-        else
-            return tfv->Render();
-    });
-
-    viewer |= ftxui::CatchEvent([&](ftxui::Event event) {
-        return tfv->HandleInput(event);
-    });
-
-    mainScreen = viewer;
-
-    ScreenHelper(mainScreen);
+    tfv->UpdateDocument(fileName);
 }
 
 // Gets the current directory and lists all item.
@@ -86,17 +63,6 @@ void Editor::LoadCurrFolder() {
     ScreenHelper(middle);
 }
 
-void Editor::StartMenuUI() {
-    std::string label = "Click to quit";
-    ftxui::Component button = ftxui::Button(&label, [&] { LoadCurrFolder(); });
-
-    auto middle = ftxui::Renderer([&] {return ftxui::vbox({
-        ftxui::text(msg),
-    }) | ftxui::center;} );
-
-    explorer = button;
-    ScreenHelper(middle);
-}
 void Editor::ScreenHelper(ftxui::Component middle) {
     mainScreen = middle; 
     mainScreen = ResizableSplitLeft(explorer, mainScreen, &left_size);
@@ -121,10 +87,6 @@ ftxui::ScreenInteractive& Editor::GetScreen() {
     return screen;
 }
 
-// This function gets called.
-void Editor::OpenFileEditor(const std::string &path) {
-    StartMenuUI();
-}
 
 bool Editor::SanityChecks(ftxui::Event event) {
     if (editorState == Workspace) {
@@ -181,9 +143,23 @@ void Editor::StartApplication() {
     option.on_enter = [&] { OpenFile(items, selected, parentDir); };
     explorer = ftxui::Menu(&items, &selected, option);
 
-    mainScreen = ftxui::Renderer([&] {return ftxui::vbox({
-            ftxui::text(msg),
-        }) | ftxui::center;} );
+    tfv = new TextFileViewer("");
+
+    // mainScreen = ftxui::Renderer([&] {return ftxui::vbox({
+    //         ftxui::text(msg),
+    //     }) | ftxui::center;} );
+
+    mainScreen = ftxui::Renderer([&](bool focused) {
+        if (focused) {
+            return tfv->Render();
+        }
+        else
+            return tfv->Render();
+    });
+
+    mainScreen |= ftxui::CatchEvent([&](ftxui::Event event) {
+        return tfv->HandleInput(event);
+    });
 
     mainScreen = ResizableSplitLeft(explorer, mainScreen, &left_size);
 
@@ -200,6 +176,9 @@ void Editor::StartApplication() {
     }, &editorStateInt);
 
     screen.Loop(final_renderer);
+
+    // Deallocation.
+    delete tfv;
 }
 
 void Editor::HomeButton(int type) {

@@ -18,6 +18,7 @@ class TextFileViewer : public ftx::ComponentBase {
 public:
     TextFileViewer(const std::string& file_path);
     ftx::Element Render() override;
+    bool UpdateDocument(const std::string& path);
     bool HandleInput(ftxui::Event event);
     Document document;
 

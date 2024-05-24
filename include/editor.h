@@ -7,6 +7,9 @@
 #include <iostream>
 #include <fstream>
 
+#include "TextFileViewer.h"
+
+
 #include "ftxui/component/captured_mouse.hpp"
 #include "ftxui/component/component.hpp"
 #include "ftxui/component/component_base.hpp"
@@ -29,6 +32,7 @@ private:
 
     ftxui::ScreenInteractive screen = ftxui::ScreenInteractive::Fullscreen();
     ftxui::Component explorer;
+    TextFileViewer* tfv;
     ftxui::Component mainScreen;
 
     // Private Functions
