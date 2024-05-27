@@ -18,7 +18,7 @@ I am doing this because the remote servers at UBC does not have neovim installed
 
 <p align="center">
 <img src="Docs/Overview.gif" alt="Simple showcase Gif" title="Simple Showcase Gif" width="700"/>
-Figure 1. Overview of the project
+<p align="center">Figure 1. Overview of the project using Warp</p>
 </p>
 
 The project uses [FTXUI](https://github.com/ArthurSonzogni/FTXUI) for the terminal UI components, 
