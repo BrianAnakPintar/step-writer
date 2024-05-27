@@ -16,9 +16,13 @@ I am doing this because the remote servers at UBC does not have neovim installed
 - Press `q` to return to main menu. (Probably should change that...)
 - You can add your own features by going into the `TextFileViewer.cpp` file.
 
-![](Docs/Overview.gif)
+<p align="center">
+<img src="Docs/Overview.gif" alt="Simple showcase Gif" title="Simple Showcase Gif" width="700"/>
+Figure 1. Overview of the project
+</p>
 
-The project uses FTXUI for the terminal UI components.
+The project uses [FTXUI](https://github.com/ArthurSonzogni/FTXUI) for the terminal UI components, 
+it is a very cool TUI library that anyone planning to make a TUI application in C++ should consider using.
 
 # Installation.
 1. Clone the project
@@ -32,4 +36,10 @@ The project uses FTXUI for the terminal UI components.
 2. Fix simple line deletion bugs.
 3. Proper cursor movement.
 4. Syntax Highlighting.
-5. REFACTOR, REFACTOR, REFACTOR! So many cleanup to do 😭
+5. Use a rope data structure.
+6. Search functionality
+7. `ctrl + c` and `ctrl + v` functionality. The OP copy + paste
+8. REFACTOR, REFACTOR, REFACTOR! So many cleanup to do 😭
+9. Custom keybindings
+10. Settings menu
+11. `ctrl + z` UNDO functionality.
