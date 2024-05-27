@@ -22,19 +22,28 @@ public:
     bool HandleInput(ftxui::Event event);
     Document document;
 
+    enum EditorModes {
+        Normal,
+        Insert,
+        Visual,
+    };
+    EditorModes editorMode;
+
 private:
     void UpdateCursor();
     void ScrollDown();
     void ScrollUp();
-
+    bool NormalModeInputHandler(ftxui::Event event);
+    bool InsertModeInputHandler(ftxui::Event event);
     std::string file_path_;
-
     int cursorX, cursorY;
     int numPadding;
 
     std::vector<ftxui::Event> keys;
     
     int viewportStart_; // Track the start position of the viewport
+
+
 };
 
 #endif // TEXT_FILE_VIEWER_HPP

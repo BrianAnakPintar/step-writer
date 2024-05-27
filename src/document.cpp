@@ -2,7 +2,6 @@
 
 Document::Document() {
     dirty = false;
-    rows.push_back("Hello World UwU.");
 }
 
 Document::Document(const std::string &path) {
@@ -20,11 +19,15 @@ int Document::Open(const std::string &path) {
     if (file.is_open()) {
         std::string line;
         while (std::getline(file, line)) {
-            rows.push_back(line);
+//            rows.push_back(line);
+            Row row(line);
+            rows.push_back(row);
         }
         file.close();
     } else {
-        rows.push_back("Failed to open file: " + path);
+          Row row("Failed to open file: " + path);
+          rows.push_back(row);
+//        rows.push_back("Failed to open file: " + path);
     }
 
     return 1;
@@ -36,7 +39,7 @@ int Document::Close() {
     return 1;
 }
 
-std::vector<std::string> Document::GetRows() {
+std::vector<Row> Document::GetRows() {
     return rows;
 }
 
@@ -44,3 +47,15 @@ int Document::GetRowsLength() {
     return rows.size();
 }
 
+void Document::Insert(int posX, int posY, char  c) {
+    rows[posY].insertText(posX, c);
+}
+
+void Document::Delete(int posX, int posY) {
+    rows[posY].deleteChar(posX);
+}
+
+void Document::NewRow(int posY) {
+    Row row;
+    rows.insert(rows.begin() + posY, row);
+}
