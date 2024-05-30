@@ -29,3 +29,13 @@ void Row::deleteChar(int idx) {
     text.erase(text.begin() + idx);
     len--;
 }
+
+void Row::appendRow(Row r) {
+    text += r.getText();
+    len += r.getLen();
+}
+
+void Row::removeString(int idx) {
+    text = text.erase(idx);
+    len = text.size();
+}

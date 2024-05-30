@@ -13,6 +13,7 @@ private:
     std::string file_path;
     bool dirty;
     std::vector<Row> rows;
+    void NewRow(int posY);
 
 public:
     Document(const std::string &path);
@@ -22,7 +23,7 @@ public:
     std::vector<Row> GetRows();
     int GetRowsLength();
     void Insert(int posX, int posY, char c);
-    void NewRow(int posY);
+    void ReturnKey(int posX, int posY);
     void Delete(int posX, int posY);
 };
 

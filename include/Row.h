@@ -9,8 +9,12 @@ public:
     Row();
     std::string getText();
     int getLen();
+
     void insertText(int idx, char c);
+    void removeString(int idx);
     void deleteChar(int idx);
+    void appendRow(Row r);
+
 private:
     std::string text;
     int len;

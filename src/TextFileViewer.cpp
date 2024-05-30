@@ -106,12 +106,23 @@ bool TextFileViewer::InsertModeInputHandler(ftxui::Event event) {
     else if (event == ftxui::Event::Backspace) {
         UpdateCursor();
         Editor& editor = Editor::GetInstance();
-        document.Delete(cursorX - editor.left_size - numPadding - 4, cursorY - 1 + viewportStart_);
+        int newX = cursorX - editor.left_size - numPadding - 4;
+        int newY = cursorY - 1;
+        if (newX <= -1) {
+            if (cursorY != 0)
+                cursorX = document.GetRows()[cursorY-2].getLen() + editor.left_size + numPadding + 4;
+            cursorY--;
+        }
+        document.Delete(newX, newY + viewportStart_);
+
         cursorX--;
     }
     else if (event == ftxui::Event::Return) {
+        Editor& editor = Editor::GetInstance();
+        document.ReturnKey(cursorX - editor.left_size - numPadding - 4, cursorY - 1 + viewportStart_);
         cursorY++;
-        document.NewRow(cursorY - 1 + viewportStart_);
+        cursorX = cursorX - editor.left_size - numPadding - 4;
+
     } else {
         handled = false;
     }
@@ -147,8 +158,13 @@ void TextFileViewer::UpdateCursor() {
 
     // Bad structure but screw it... Bounds Check for line
     int line_size = document.GetRows()[cursorY - 1 + viewportStart_].getLen();
-    if (cursorX > editor.left_size + numPadding + 3 + line_size)
-        cursorX = editor.left_size + numPadding + 3 + line_size;
+    if (cursorX > editor.left_size + numPadding + 3 + line_size) {
+        // cursorX = editor.left_size + numPadding + 3 + line_size;
+
+        cursorX = editor.left_size + numPadding + 3;
+        cursorY++;
+        UpdateCursor();
+    }
     if (cursorY + viewportStart_ > document.GetRowsLength())
         cursorY = std::min(document.GetRowsLength(), editor.GetScreen().dimy() - 1);
 

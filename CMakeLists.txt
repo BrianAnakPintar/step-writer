@@ -7,19 +7,20 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include(FetchContent)
 
 FetchContent_Declare(
-  ftxui
-  GIT_REPOSITORY https://github.com/ArthurSonzogni/ftxui
-  GIT_TAG v5.0.0
+        ftxui
+        GIT_REPOSITORY https://github.com/ArthurSonzogni/ftxui
+        GIT_TAG v5.0.0
 )
 
 FetchContent_MakeAvailable(ftxui)
 
-add_executable(step-writer src/main.cpp src/Editor.cpp src/editor.cpp src/document.cpp src/TextFileViewer.cpp
-        src/TextFileViewer.cpp
-        src/TextFileViewer.cpp
-        include/Row.h
+add_executable(step-writer
+        src/main.cpp
+        src/Editor.cpp
+        src/Document.cpp
         src/Row.cpp
-        include/Row.h)
+        src/TextFileViewer.cpp)
+target_include_directories(step-writer PRIVATE include)
 target_link_libraries(step-writer PRIVATE ftxui::screen
-                                  PRIVATE ftxui::dom
-                                  PRIVATE ftxui::component)
+        PRIVATE ftxui::dom
+        PRIVATE ftxui::component)

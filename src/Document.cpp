@@ -19,7 +19,6 @@ int Document::Open(const std::string &path) {
     if (file.is_open()) {
         std::string line;
         while (std::getline(file, line)) {
-//            rows.push_back(line);
             Row row(line);
             rows.push_back(row);
         }
@@ -27,7 +26,6 @@ int Document::Open(const std::string &path) {
     } else {
           Row row("Failed to open file: " + path);
           rows.push_back(row);
-//        rows.push_back("Failed to open file: " + path);
     }
 
     return 1;
@@ -52,10 +50,26 @@ void Document::Insert(int posX, int posY, char  c) {
 }
 
 void Document::Delete(int posX, int posY) {
+    if (posX < 0) {
+        // If delete at beginning.
+        if (posY > 0) {
+            rows[posY-1].appendRow(rows[posY]);
+            rows.erase(rows.begin() + posY);
+        }
+        return;
+    }
     rows[posY].deleteChar(posX);
 }
 
 void Document::NewRow(int posY) {
     Row row;
     rows.insert(rows.begin() + posY, row);
+}
+
+void Document::ReturnKey(int posX, int posY) {
+    Row r = rows[posY];
+    rows[posY].removeString(posX+1);
+    std::string afterText = r.getText().substr(posX+1);
+    Row row(afterText);
+    rows.insert(rows.begin() + posY+1, row);
 }
