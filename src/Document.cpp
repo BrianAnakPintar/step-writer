@@ -11,7 +11,6 @@ Document::Document(const std::string &path) {
         if (Open(path))
             break;
     }
-
 }
 
 int Document::Open(const std::string &path) {
@@ -46,6 +45,7 @@ int Document::GetRowsLength() {
 }
 
 void Document::Insert(int posX, int posY, char  c) {
+    dirty = true;
     rows[posY].insertText(posX, c);
 }
 

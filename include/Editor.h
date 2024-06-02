@@ -62,6 +62,7 @@ public:
 
     // Variables
     bool quitSignal;
+    bool showTerminal;
     int left_size = 20;
 
     int focusX, focusY;

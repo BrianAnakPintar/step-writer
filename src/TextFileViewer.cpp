@@ -1,5 +1,5 @@
-#include "../include/TextFileViewer.h"
-#include "../include/Editor.h"
+#include "TextFileViewer.h"
+#include "Editor.h"
 #include "ftxui/component/event.hpp"
 #include "ftxui/screen/screen.hpp"
 
@@ -32,7 +32,7 @@ ftx::Element TextFileViewer::Render() {
     int max_number_length = std::to_string(document.GetRowsLength()).size(); // Get the length of the longest line number.
     numPadding = max_number_length;
     auto msgTmp = text(L"(" + std::to_wstring(cursorX) + L", " + std::to_wstring(cursorY) + L")" + std::to_wstring(Editor::GetInstance().GetScreen().dimy()));
-    int viewportEnd = std::min(viewportStart_ + Editor::GetInstance().GetScreen().dimy() - 2, static_cast<int>(document.GetRowsLength()));
+    int viewportEnd = std::min(viewportStart_ + Editor::GetInstance().GetScreen().dimy() - 3, static_cast<int>(document.GetRowsLength()));
 
     for (int i = viewportStart_; i < viewportEnd; i++) {
         auto line_number = std::to_wstring(i+1);
@@ -71,7 +71,12 @@ bool TextFileViewer::NormalModeInputHandler(ftxui::Event event) {
     }
     else if (event == ftxui::Event::Character('i')) {
         editorMode = Insert;
-    } else {
+    } 
+    else if (event == ftxui::Event::Character(' ')) {
+        Editor& editor = Editor::GetInstance();
+        editor.showTerminal = !editor.showTerminal;
+    }
+    else {
         handled = false;
     }
 
@@ -108,6 +113,10 @@ bool TextFileViewer::InsertModeInputHandler(ftxui::Event event) {
         Editor& editor = Editor::GetInstance();
         int newX = cursorX - editor.left_size - numPadding - 4;
         int newY = cursorY - 1;
+
+        if (newY == 0 && newX < 0)
+            return true;
+
         if (newX <= -1) {
             if (cursorY != 0)
                 cursorX = document.GetRows()[cursorY-2].getLen() + editor.left_size + numPadding + 4;
@@ -145,6 +154,14 @@ void TextFileViewer::UpdateCursor() {
 
     // Bounds Checking to ensure that the cursor is at the appropriate place.
     if (cursorX < editor.left_size + numPadding + 3) {
+        // if (cursorY > 1) {
+        //     cursorY--;
+        //     int prevLineSize = document.GetRows()[cursorY - 1 + viewportStart_].getLen();
+        //     cursorX = editor.left_size + numPadding + 3 + prevLineSize;
+        // } else {
+        //     cursorX = editor.left_size + numPadding + 3;
+
+        // }
         cursorX = editor.left_size + numPadding + 3;
     } else if (cursorX >= editor.GetScreen().dimx()) {
         cursorX = editor.GetScreen().dimx() - 1;
@@ -159,20 +176,13 @@ void TextFileViewer::UpdateCursor() {
     // Bad structure but screw it... Bounds Check for line
     int line_size = document.GetRows()[cursorY - 1 + viewportStart_].getLen();
     if (cursorX > editor.left_size + numPadding + 3 + line_size) {
-        // cursorX = editor.left_size + numPadding + 3 + line_size;
-
-        cursorX = editor.left_size + numPadding + 3;
-        cursorY++;
-        UpdateCursor();
+        cursorX = editor.left_size + numPadding + 3 + line_size;
     }
+
     if (cursorY + viewportStart_ > document.GetRowsLength())
         cursorY = std::min(document.GetRowsLength(), editor.GetScreen().dimy() - 1);
 
-    if (editor.focusY <= 0)
-        editor.focusY = 0;
-    if (editor.focusX <= 0)
-        editor.focusX = 0;
-
+    // Deals with cursor shape & finalize.
     ftxui::Screen::Cursor cursor = {cursorX + 1, cursorY};
 
     if (editorMode == Normal)

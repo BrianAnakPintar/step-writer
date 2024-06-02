@@ -16,7 +16,6 @@ Also use proper function calls where necessary.
 
 */
 
-
 // Similar to the `ls` command that outputs all files in a directory. 
 // It takes a path string, and outputs a vector of strings of all files in the path.
 std::vector<std::string> Editor::ListFiles(const std::string& path) {
@@ -87,8 +86,30 @@ ftxui::ScreenInteractive& Editor::GetScreen() {
     return screen;
 }
 
+// Definition of the modal component. The details are not important.
+ftxui::Component ModalComponent(std::function<void()> do_nothing,
+                                std::function<void()> hide_modal) {
+    using namespace ftxui;
+    auto component = Container::Vertical({
+        Button("Do nothing", do_nothing),
+        Button("Quit modal", hide_modal),
+    });
+    // Polish how the two buttons are rendered:
+    component |= Renderer([&](Element inner) {
+        return vbox({
+                text("Modal component "),
+                separator(),
+                inner,
+            })                               //
+            | size(WIDTH, GREATER_THAN, 30)  //
+            | border;                        //
+    });
+    return component;
+}
 
 bool Editor::SanityChecks(ftxui::Event event) {
+    if (event.is_mouse())
+        return true;
     if (editorState == Workspace) {
         if (event == ftxui::Event::Character('q')) {
             editorStateInt = 0;
@@ -161,9 +182,26 @@ void Editor::StartApplication() {
         return tfv->HandleInput(event);
     });
 
-    mainScreen = ResizableSplitLeft(explorer, mainScreen, &left_size);
+    auto status_bar = hbox(text(" NORMAL ") | bgcolor(Color::NavajoWhite1));
 
-    auto EditorComponent = ftxui::Renderer(mainScreen, [&] { return mainScreen->Render() | ftxui::border; });
+    mainScreen = ResizableSplitLeft(explorer, mainScreen, &left_size);
+    showTerminal = false;
+    auto show_modal = [&] { showTerminal = true; };
+    auto hide_modal = [&] { showTerminal = false; };
+    auto modal_component = ModalComponent(hide_modal, hide_modal);
+
+    // Create a vertical layout with mainScreen and status_bar
+    auto main_with_status_bar = Renderer([&] {
+        return vbox({
+            mainScreen->Render() | flex_grow,
+            hbox({
+                status_bar,
+            }) | size(HEIGHT, EQUAL, 1) | bgcolor(Color::Blue)
+        });
+    });
+
+    auto EditorComponent = ftxui::Renderer(mainScreen, [&] { return window(text("Editor.cpp") | color(Color::Blue) | hcenter | bold, main_with_status_bar->Render());});
+    EditorComponent |= Modal(modal_component, &showTerminal);
 
     EditorComponent |= ftxui::CatchEvent([&](ftxui::Event event) {
         return SanityChecks(event);

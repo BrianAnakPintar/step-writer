@@ -26,6 +26,9 @@ void Row::insertText(int idx, char c) {
 
 void Row::deleteChar(int idx) {
     // Normal Case
+    if (len == 0 || idx >= len) {
+        return;
+    }
     text.erase(text.begin() + idx);
     len--;
 }
@@ -36,6 +39,8 @@ void Row::appendRow(Row r) {
 }
 
 void Row::removeString(int idx) {
+    if (idx > len)
+        return;
     text = text.erase(idx);
     len = text.size();
 }
