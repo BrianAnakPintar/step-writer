@@ -19,7 +19,7 @@ public:
     Document(const std::string &path);
     Document();
     int Open(const std::string &path);
-    int Close();
+    int Save();
     std::vector<Row> GetRows();
     int GetRowsLength();
     void Insert(int posX, int posY, char c);

@@ -13,6 +13,7 @@ Document::Document(const std::string &path) {
     }
 }
 
+// Returns 1 if succ
 int Document::Open(const std::string &path) {
     std::ifstream file(path);
     if (file.is_open()) {
@@ -22,15 +23,12 @@ int Document::Open(const std::string &path) {
             rows.push_back(row);
         }
         file.close();
-    } else {
-          Row row("Failed to open file: " + path);
-          rows.push_back(row);
+        return 1;
     }
-
-    return 1;
+    return -1;
 }
 
-int Document::Close() {
+int Document::Save() {
     // TODO:
 
     return 1;

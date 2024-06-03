@@ -100,9 +100,9 @@ ftxui::Component ModalComponent(std::function<void()> do_nothing,
                 text("Modal component "),
                 separator(),
                 inner,
-            })                               //
-            | size(WIDTH, GREATER_THAN, 30)  //
-            | border;                        //
+            })
+            | size(WIDTH, GREATER_THAN, 30)
+            | border;
     });
     return component;
 }

@@ -197,8 +197,8 @@ void TextFileViewer::ScrollDown() {
     // Increment the viewport start to scroll down
     viewportStart_++;
     // Limit the viewport start to prevent scrolling past the end of the file
-    if (viewportStart_ > static_cast<int>(document.GetRowsLength()) - Editor::GetInstance().GetScreen().dimy() + 2) {
-        viewportStart_ = static_cast<int>(document.GetRowsLength()) - Editor::GetInstance().GetScreen().dimy() + 2;
+    if (viewportStart_ > static_cast<int>(document.GetRowsLength()) - Editor::GetInstance().GetScreen().dimy() + 3) {
+        viewportStart_ = static_cast<int>(document.GetRowsLength()) - Editor::GetInstance().GetScreen().dimy() + 3;
     }
 }
 
