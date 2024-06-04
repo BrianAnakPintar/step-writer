@@ -28,20 +28,24 @@ public:
         Visual,
     };
     EditorModes editorMode;
+    void SignalEditorModeChange();
 
 private:
     void UpdateCursor();
     void ScrollDown();
     void ScrollUp();
+    int GetBottomY();
+    int GetRightX();
+    int GetTransformedX(int x);
     bool NormalModeInputHandler(ftxui::Event event);
     bool InsertModeInputHandler(ftxui::Event event);
-    std::string file_path_;
+    std::string file_path;
     int cursorX, cursorY;
     int numPadding;
 
     std::vector<ftxui::Event> keys;
     
-    int viewportStart_; // Track the start position of the viewport
+    int viewportStart; // Track the start position of the viewport
 
 
 };

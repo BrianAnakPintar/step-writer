@@ -40,9 +40,12 @@ private:
     std::vector<std::string> ListFiles(const std::string& path);
     void StartMenuUI();
     void OpenFile(std::vector<std::string> files, int idx, std::string& base_path);
-    void ScreenHelper(ftxui::Component);
 
+    void ScreenHelper(ftxui::Component);
     bool SanityChecks(ftxui::Event event);
+
+    std::string status_EditorMode;
+    std::string status_msg;
 
     void HomeButton(int type);
     ftxui::Component buttonsHelper(ftxui::Component &menu, ftxui::Component &workspace, ftxui::Component &settings);
@@ -59,6 +62,10 @@ public:
     void operator=(const Editor&) = delete;
     static Editor& GetInstance();
     ftxui::ScreenInteractive& GetScreen();
+
+    void ChangeEditorStatus(std::string s);
+    void SetEditorMsg(std::string s);
+
 
     // Variables
     bool quitSignal;

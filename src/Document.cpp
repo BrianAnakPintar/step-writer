@@ -13,7 +13,7 @@ Document::Document(const std::string &path) {
     }
 }
 
-// Returns 1 if succ
+// Returns 1 if succeed
 int Document::Open(const std::string &path) {
     std::ifstream file(path);
     if (file.is_open()) {

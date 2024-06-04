@@ -111,7 +111,7 @@ bool Editor::SanityChecks(ftxui::Event event) {
     if (event.is_mouse())
         return true;
     if (editorState == Workspace) {
-        if (event == ftxui::Event::Character('q')) {
+        if (event == ftxui::Event::Special({16})) {   // If Ctrl-P is pressed
             editorStateInt = 0;
             return true;
         }
@@ -154,6 +154,7 @@ void Editor::StartApplication() {
 
     // Access the parent directory
     fs::path parentPath = fs::path(currentDirectory).parent_path();
+    parentPath /= "src";
 
     std::string parentDir = parentPath.string();
 
@@ -172,19 +173,32 @@ void Editor::StartApplication() {
 
     mainScreen = ftxui::Renderer([&](bool focused) {
         if (focused) {
+            tfv->SignalEditorModeChange();
             return tfv->Render();
         }
-        else
+        else {
+            status_EditorMode = "EXPLORER";
             return tfv->Render();
+        }
     });
 
     mainScreen |= ftxui::CatchEvent([&](ftxui::Event event) {
         return tfv->HandleInput(event);
     });
-
-    auto status_bar = hbox(text(" NORMAL ") | bgcolor(Color::NavajoWhite1));
-
     mainScreen = ResizableSplitLeft(explorer, mainScreen, &left_size);
+
+    // TODO: Delete Later
+    status_msg = "Press CTRL + P to go back to main menu.";
+
+    auto status_bar = Renderer([&] {
+        return hbox(text(" " + status_EditorMode + " ") | bgcolor(Color::NavajoWhite1) | bold,
+                    text(" " + status_msg + " "));
+    });
+    
+
+    auto composition = Container::Vertical({mainScreen, status_bar});
+
+
     showTerminal = false;
     auto show_modal = [&] { showTerminal = true; };
     auto hide_modal = [&] { showTerminal = false; };
@@ -195,12 +209,12 @@ void Editor::StartApplication() {
         return vbox({
             mainScreen->Render() | flex_grow,
             hbox({
-                status_bar,
+                status_bar->Render(),
             }) | size(HEIGHT, EQUAL, 1) | bgcolor(Color::Blue)
         });
     });
 
-    auto EditorComponent = ftxui::Renderer(mainScreen, [&] { return window(text("Editor.cpp") | color(Color::Blue) | hcenter | bold, main_with_status_bar->Render());});
+    auto EditorComponent = ftxui::Renderer(composition, [&] { return window(text("Editor.cpp") | color(Color::Blue) | hcenter | bold, main_with_status_bar->Render());});
     EditorComponent |= Modal(modal_component, &showTerminal);
 
     EditorComponent |= ftxui::CatchEvent([&](ftxui::Event event) {
@@ -219,9 +233,17 @@ void Editor::StartApplication() {
     delete tfv;
 }
 
+void Editor::ChangeEditorStatus(std::string s) {
+    status_EditorMode = s;
+}
+
+void Editor::SetEditorMsg(std::string s) {
+    status_msg = s;
+}
+
 void Editor::HomeButton(int type) {
     if (type == 0) {
-    editorState = Workspace;
+        editorState = Workspace;
         editorStateInt = 1;
     }
         

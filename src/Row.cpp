@@ -39,7 +39,7 @@ void Row::appendRow(Row r) {
 }
 
 void Row::removeString(int idx) {
-    if (idx > len)
+    if (idx > len || idx < 0)
         return;
     text = text.erase(idx);
     len = text.size();
