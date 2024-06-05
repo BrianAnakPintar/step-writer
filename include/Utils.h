@@ -61,7 +61,7 @@ ftxui::ButtonOption CustomButton() {
         return text(t);
     };
     return option;
- }
+}
 
 
 #endif

@@ -25,6 +25,7 @@ int Document::Open(const std::string &path) {
         file.close();
         return 1;
     }
+    rows.push_back(Row("Error opening file."));
     return -1;
 }
 

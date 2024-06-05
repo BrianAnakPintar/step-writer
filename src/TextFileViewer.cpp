@@ -164,6 +164,14 @@ bool TextFileViewer::HandleInput(ftxui::Event event) {
 void TextFileViewer::UpdateCursor() {
     auto& editor = Editor::GetInstance();
 
+    // Bad structure but screw it... Bounds Check for line
+    int line_size = document.GetRows()[cursorY + viewportStart].getLen();
+    if (cursorY + viewportStart > document.GetRowsLength() - 1)
+        cursorY = std::min(document.GetRowsLength() - 1, GetBottomY());
+    if (cursorX > line_size) {
+        cursorX = line_size;
+    }
+
     // Bounds Checking to ensure that the cursor is at the appropriate place.
     if (cursorX < 0) {
         cursorX = 0;
@@ -176,15 +184,6 @@ void TextFileViewer::UpdateCursor() {
         cursorY = GetBottomY();
         ScrollDown();
     }
-
-    // Bad structure but screw it... Bounds Check for line
-    int line_size = document.GetRows()[cursorY + viewportStart].getLen();
-    if (cursorX > line_size) {
-        cursorX = line_size;
-    }
-
-    if (cursorY + viewportStart > document.GetRowsLength())
-        cursorY = std::min(document.GetRowsLength(), GetBottomY());
 
     // Deals with cursor shape & finalize.
     ftxui::Screen::Cursor cursor = {GetTransformedX(cursorX), cursorY + 1};

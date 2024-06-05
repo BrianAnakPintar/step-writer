@@ -1,80 +1,26 @@
-#include "../include/Editor.h"
-#include "../include/Utils.h"
+#include "Editor.h"
+#include "Utils.h"
+#include "DirectoryFile.hpp"
+#include "DataFile.hpp"
 
-/* REFACTORING | Notes for later.
-
-I am planning to make things work for now.
-The design in which I am making and writing these things is horrible.
-
-Ideally, we would use the MVC pattern where we split our program into
-2 parts, the UI and the main functionality. This would greatly enhance our code!
-Additionally, I would also advise myself to add unit tests ASAP. The longer I delay,
-the more I might regret this ;-;
-
-Next, there are lots of redundant code here with unused function, try to get rid of them.
-Also use proper function calls where necessary.
-
-*/
+// TODO: REFACTORING NOTES, APPLY MVC PATTERN.
 
 // Similar to the `ls` command that outputs all files in a directory. 
 // It takes a path string, and outputs a vector of strings of all files in the path.
-std::vector<std::string> Editor::ListFiles(const std::string& path) {
-    std::vector<std::string> items;
-    DIR *dir = opendir(path.c_str());
-    if (dir) {
-        struct dirent *entry;
-        while ((entry = readdir(dir)) != nullptr) {
-            items.push_back(entry->d_name);
-        }
-        closedir(dir);
-    }
-    return items;
+File* Editor::ListFiles(const std::string& path) {
+    File *project_file = new DirectoryFile("project", path);
+    if (project_file->OpenFile())
+        return project_file;
+    return project_file;
 }
 
 std::string msg = "Use the button the left to open";
 
 void Editor::OpenFile(std::vector<std::string> files, int idx, std::string& base_path) {
+    // TODO Check if it's a directory. If so, then populate the collapsible. Otherwise open the file.
+
     std::string fileName = base_path + "/" + files[idx];
     tfv->UpdateDocument(fileName);
-}
-
-// Gets the current directory and lists all item.
-void Editor::LoadCurrFolder() {
-    char buffer[FILENAME_MAX];
-    getcwd(buffer, FILENAME_MAX);
-    std::string currentDirectory(buffer);
-
-    // Access the parent directory
-    fs::path parentPath = fs::path(currentDirectory).parent_path();
-
-    std::string parentDir = parentPath.string();
-
-    std::vector<std::string> items = ListFiles(parentDir);
-    int selected = 0;
-
-    ftxui::MenuOption option;
-    option.on_enter = [&] { OpenFile(items, selected, parentDir); };
-    explorer = ftxui::Menu(&items, &selected, option);
-
-    auto middle = ftxui::Renderer([&] {return ftxui::vbox({
-            ftxui::text(msg),
-        }) | ftxui::center;} );
-    ScreenHelper(middle);
-}
-
-void Editor::ScreenHelper(ftxui::Component middle) {
-    mainScreen = middle; 
-    mainScreen = ResizableSplitLeft(explorer, mainScreen, &left_size);
-
-    screen.Clear();
-    screen.ExitLoopClosure();
-    auto renderer = ftxui::Renderer(mainScreen, [&] { return mainScreen->Render() | ftxui::border; });
-
-    renderer |= ftxui::CatchEvent([&](ftxui::Event event) {
-        return SanityChecks(event);
-    });
-
-    screen.Loop(renderer);
 }
 
 Editor& Editor::GetInstance() {
@@ -108,8 +54,6 @@ ftxui::Component ModalComponent(std::function<void()> do_nothing,
 }
 
 bool Editor::SanityChecks(ftxui::Event event) {
-    if (event.is_mouse())
-        return true;
     if (editorState == Workspace) {
         if (event == ftxui::Event::Special({16})) {   // If Ctrl-P is pressed
             editorStateInt = 0;
@@ -154,22 +98,15 @@ void Editor::StartApplication() {
 
     // Access the parent directory
     fs::path parentPath = fs::path(currentDirectory).parent_path();
-    parentPath /= "src";
+    // parentPath /= "src";
 
     std::string parentDir = parentPath.string();
 
-    std::vector<std::string> items = ListFiles(parentDir);
-    int selected = 0;
+    File* root = ListFiles(parentDir);
 
-    ftxui::MenuOption option;
-    option.on_enter = [&] { OpenFile(items, selected, parentDir); };
-    explorer = ftxui::Menu(&items, &selected, option);
+    auto x = ftxui::Container::Vertical({});
 
     tfv = new TextFileViewer("");
-
-    // mainScreen = ftxui::Renderer([&] {return ftxui::vbox({
-    //         ftxui::text(msg),
-    //     }) | ftxui::center;} );
 
     mainScreen = ftxui::Renderer([&](bool focused) {
         if (focused) {
@@ -185,7 +122,13 @@ void Editor::StartApplication() {
     mainScreen |= ftxui::CatchEvent([&](ftxui::Event event) {
         return tfv->HandleInput(event);
     });
-    mainScreen = ResizableSplitLeft(explorer, mainScreen, &left_size);
+
+    explorer = root->RenderTree();
+    auto t = Renderer(explorer, [&] {
+        return explorer->Render() | vscroll_indicator | frame | size(HEIGHT, LESS_THAN, GetScreen().dimy()-3);
+    });
+
+    mainScreen = ResizableSplitLeft(t, mainScreen, &left_size);
 
     // TODO: Delete Later
     status_msg = "Press CTRL + P to go back to main menu.";
@@ -225,7 +168,7 @@ void Editor::StartApplication() {
     auto final_renderer = Container::Tab({
     MainMenuComponent,
     EditorComponent
-    }, &editorStateInt);
+    }, &editorStateInt); // Add bgcolor here if you want "customization"
 
     screen.Loop(final_renderer);
 
@@ -254,4 +197,10 @@ void Editor::HomeButton(int type) {
     else {
         screen.Exit();
     }
+}
+
+void Editor::UpdateDoc(const std::string& path) {
+    if (tfv == nullptr)
+        return;
+    tfv->UpdateDocument(path);
 }

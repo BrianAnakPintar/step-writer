@@ -30,6 +30,8 @@ add_executable(step-writer
     src/Document.cpp
     src/Row.cpp
     src/TextFileViewer.cpp
+    src/DataFile.cpp
+    src/DirectoryFile.cpp
 )
 target_include_directories(step-writer PRIVATE include)
 target_link_libraries(step-writer PRIVATE ftxui::screen

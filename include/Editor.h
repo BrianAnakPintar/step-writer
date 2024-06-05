@@ -8,7 +8,7 @@
 #include <fstream>
 
 #include "TextFileViewer.h"
-
+#include "File.hpp"
 
 #include "ftxui/component/captured_mouse.hpp"
 #include "ftxui/component/component.hpp"
@@ -32,16 +32,14 @@ private:
 
     ftxui::ScreenInteractive screen = ftxui::ScreenInteractive::Fullscreen();
     ftxui::Component explorer;
-    TextFileViewer* tfv;
+    TextFileViewer *tfv;
     ftxui::Component mainScreen;
 
     // Private Functions
-    void LoadCurrFolder();
-    std::vector<std::string> ListFiles(const std::string& path);
+    File* ListFiles(const std::string& path);
     void StartMenuUI();
     void OpenFile(std::vector<std::string> files, int idx, std::string& base_path);
 
-    void ScreenHelper(ftxui::Component);
     bool SanityChecks(ftxui::Event event);
 
     std::string status_EditorMode;
@@ -66,6 +64,7 @@ public:
     void ChangeEditorStatus(std::string s);
     void SetEditorMsg(std::string s);
 
+    void UpdateDoc(const std::string& path);
 
     // Variables
     bool quitSignal;
