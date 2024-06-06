@@ -4,7 +4,7 @@ Document::Document() {
     dirty = false;
 }
 
-Document::Document(const std::string &path) {
+Document::Document(const std::string &path) : file_path(path) {
     dirty = false;
     // Try opening 3x.
     for (int i = 0; i < 3; i++) {
@@ -26,11 +26,18 @@ int Document::Open(const std::string &path) {
         return 1;
     }
     rows.push_back(Row("Error opening file."));
-    return -1;
+    return 0;
 }
 
 int Document::Save() {
-    // TODO:
+    std::ofstream outFile(file_path);
+    if (!outFile) {
+        return 0;
+    }
+    for (Row r : rows) {
+        outFile << r.getText() << std::endl;
+    }
+    outFile.close();
 
     return 1;
 }
@@ -71,4 +78,8 @@ void Document::ReturnKey(int posX, int posY) {
     std::string afterText = r.getText().substr(posX+1);
     Row row(afterText);
     rows.insert(rows.begin() + posY+1, row);
+}
+
+bool Document::isDirty() {
+    return dirty;
 }

@@ -25,6 +25,7 @@ public:
     void Insert(int posX, int posY, char c);
     void ReturnKey(int posX, int posY);
     void Delete(int posX, int posY);
+    bool isDirty();
 };
 
 

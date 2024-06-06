@@ -19,7 +19,6 @@ FetchContent_Declare(
     googletest
     URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
 )
-# For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
@@ -32,22 +31,30 @@ add_executable(step-writer
     src/TextFileViewer.cpp
     src/DataFile.cpp
     src/DirectoryFile.cpp
+    src/Tokenizer.cpp
 )
 target_include_directories(step-writer PRIVATE include)
-target_link_libraries(step-writer PRIVATE ftxui::screen
-                                   PRIVATE ftxui::dom
-                                   PRIVATE ftxui::component)
+target_link_libraries(step-writer
+    PRIVATE ftxui::screen
+    PRIVATE ftxui::dom
+    PRIVATE ftxui::component
+)
 
 # Enable testing
 enable_testing()
 
 # Define the test executable
-add_executable(all-test tests/RowTest.cpp 
-                        tests/DocumentTest.cpp
-                        src/Row.cpp
-                        src/Document.cpp)
+add_executable(all-test
+    tests/RowTest.cpp 
+    tests/DocumentTest.cpp
+    src/Row.cpp
+    src/Document.cpp
+    src/Tokenizer.cpp
+)
 target_include_directories(all-test PRIVATE include)
-target_link_libraries(all-test PRIVATE GTest::gtest_main)
+target_link_libraries(all-test PRIVATE GTest::gtest_main
+                               PRIVATE ftxui::component)
+    
 
 # Include GoogleTest CMake functions
 include(GoogleTest)

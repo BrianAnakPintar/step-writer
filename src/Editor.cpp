@@ -55,8 +55,11 @@ ftxui::Component ModalComponent(std::function<void()> do_nothing,
 
 bool Editor::SanityChecks(ftxui::Event event) {
     if (editorState == Workspace) {
-        if (event == ftxui::Event::Special({16})) {   // If Ctrl-P is pressed
-            editorStateInt = 0;
+        if (event == ftxui::Event::Special({16})) {   // If Ctrl + P is pressed
+            if (tfv->isDirty()) {
+                if (tfv->SaveFile())
+                    editorStateInt = 0;
+            }  
             return true;
         }
     }
@@ -131,16 +134,13 @@ void Editor::StartApplication() {
     mainScreen = ResizableSplitLeft(t, mainScreen, &left_size);
 
     // TODO: Delete Later
-    status_msg = "Press CTRL + P to go back to main menu.";
-
+    status_msg = "Press CTRL + P to go back to main menu. | ʕ•́ᴥ•̀ʔっ";
     auto status_bar = Renderer([&] {
-        return hbox(text(" " + status_EditorMode + " ") | bgcolor(Color::NavajoWhite1) | bold,
-                    text(" " + status_msg + " "));
+        return hbox(text(status_EditorMode) | color(Color::Grey0) | bgcolor(Color::NavajoWhite1) | bold,
+                    color(Color::Grey100, text(" " + status_msg + " ")));
     });
     
-
     auto composition = Container::Vertical({mainScreen, status_bar});
-
 
     showTerminal = false;
     auto show_modal = [&] { showTerminal = true; };

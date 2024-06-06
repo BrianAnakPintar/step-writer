@@ -1,4 +1,6 @@
 #include "../include/Row.h"
+#include "Tokenizer.hpp"
+#include <vector>
 
 Row::Row(std::string s) {
     text = s;
@@ -43,4 +45,37 @@ void Row::removeString(int idx) {
         return;
     text = text.erase(idx);
     len = text.size();
+}
+
+// Renders with syntax highlighting. Returns an hbox component where texts fill row.
+ftxui::Element Row::Render() {
+  using namespace ftxui;
+  Tokenizer& tokenizer = Tokenizer::GetInstance();
+  std::vector<Token> tokens = tokenizer.Tokenize(getText());
+
+  Elements elements; 
+
+  for (const Token& token : tokens) {
+    std::string token_text_with_space = token.text + " ";
+
+    switch (token.type) {
+      case TokenType::Keyword:
+        elements.push_back(ftxui::text(token_text_with_space) | color(Color::SkyBlue1));
+        break;
+      case TokenType::Operator:
+        elements.push_back(ftxui::text(token_text_with_space) | color(Color::IndianRed1));
+        break;
+      case TokenType::Number:
+        elements.push_back(ftxui::text(token_text_with_space) | color(Color::Yellow));
+        break;
+      case TokenType::String:
+        elements.push_back(ftxui::text(token_text_with_space) | color(Color::DarkSeaGreen4));
+        break;
+      default:
+        elements.push_back(ftxui::text(token_text_with_space));
+        break;
+    }
+  }
+
+  return hbox(std::move(elements));
 }

@@ -52,7 +52,7 @@ ftx::Element TextFileViewer::Render() {
         std::wstring padded_number = std::wstring(numPadding - line_number.size(), L' ') + line_number;
         auto line_elem = hbox(
             text(padded_number + L"  ") | color(Color::Blue) | dim,
-            text(document.GetRows()[i].getText())
+            document.GetRows()[i].Render()
         );
         elements.push_back(line_elem);
     }
@@ -232,4 +232,12 @@ void TextFileViewer::SignalEditorModeChange() {
     final_str = " " + final_str + " ";
     Editor& editor = Editor::GetInstance();
     editor.ChangeEditorStatus(final_str);
+}
+
+bool TextFileViewer::SaveFile() {
+    return document.Save();
+}
+
+bool TextFileViewer::isDirty() {
+    return document.isDirty();
 }

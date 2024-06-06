@@ -2,6 +2,7 @@
 #define STEP_WRITER_ROW_H
 
 #include <string>
+#include "ftxui/component/component.hpp"
 
 class Row {
 public:
@@ -14,6 +15,7 @@ public:
     void removeString(int idx);
     void deleteChar(int idx);
     void appendRow(Row r);
+    ftxui::Element Render();
 
 private:
     std::string text;

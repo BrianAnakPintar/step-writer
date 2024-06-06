@@ -2,7 +2,7 @@
 #ifndef TEXT_FILE_VIEWER_HPP
 #define TEXT_FILE_VIEWER_HPP
 
-#include <ftxui/component/component.hpp>
+#include "ftxui/component/component.hpp"
 #include "ftxui/component/event.hpp"
 #include "Document.h"
 #include <memory>
@@ -29,6 +29,8 @@ public:
     };
     EditorModes editorMode;
     void SignalEditorModeChange();
+    bool SaveFile();
+    bool isDirty();
 
 private:
     void UpdateCursor();
