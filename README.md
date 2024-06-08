@@ -1,8 +1,9 @@
 # STEP-Writer
-### ~~Shared~~ Scuffed Text Editor Program - Writer.
-#### A C++ TUI Text Editor 
-Yeah, I'm proud of my acronyms.
-___
+### ~~Scuffed~~ Shared Text Editor Program - Writer.
+### A Lightweight & Simple C++ TUI Text Editor. 
+<p align="center">
+<img src="Docs/ThemesStacked.png" alt="Simple Images" title="Simple Image" width="700"/>
+</p>
 
 # Overview.
 Step-Writer is a TUI text editor. Which *simulates* vim motions and other customizable features. 
@@ -15,10 +16,13 @@ I am doing this because the remote servers at UBC does not have neovim installed
 - Press `enter` on the file in the explorer in order to open the file.
 - Press `q` to return to main menu. (Probably should change that...)
 - You can add your own features by going into the `TextFileViewer.cpp` file.
-
+- Syntax Highlighting using Tree Sitter. (Will improve)
+- Saving file. `ctrl + p` saves and quits.
+- File Explorer navigation with collapsible tabs.
+- Status Bar indicating the mode (INSERT, NORMAL, VISUAL)
 <p align="center">
-<img src="Docs/Overview.gif" alt="Simple showcase Gif" title="Simple Showcase Gif" width="700"/>
-<p align="center">Figure 1. Overview of the project using Warp</p>
+<img src="Docs/Screenshot.png" alt="Simple showcase Gif" title="Simple Image" width="700"/>
+<p align="center">Figure 1. Overview of the project using Wezterm</p>
 </p>
 
 The project uses [FTXUI](https://github.com/ArthurSonzogni/FTXUI) for the terminal UI components, 
@@ -32,14 +36,28 @@ it is a very cool TUI library that anyone planning to make a TUI application in 
 5. Finally, run the program `./step-writer` from the build directory.
 
 ### Todo (soo many things to do ;-;)
-1. Better file view hierarchy enabling users to see project structures and directory contents.
-2. Fix simple line deletion bugs.
-3. Proper cursor movement.
-4. Syntax Highlighting.
-5. Use a rope data structure.
-6. Search functionality
-7. `ctrl + c` and `ctrl + v` functionality. The OP copy + paste
-8. REFACTOR, REFACTOR, REFACTOR! So many cleanup to do 😭
-9. Custom keybindings
-10. Settings menu
-11. `ctrl + z` UNDO functionality.
+- [x] Better file view hierarchy enabling users to see project structures and directory contents.
+- [x] Fix simple line deletion bugs.
+- [ ] A working terminal.
+- [ ] Better cursor movement.
+- [ ] Syntax Highlighting (Sort of).
+  - [x] Basic syntax highlighting.
+  - [ ] Implement colors for ALL types.
+  - [ ] Update syntax tree when user inputs a line.
+- [ ] Use a ~~rope~~ gap buffer data structure.
+- [ ] Search functionality
+- [ ] `ctrl + c` and `ctrl + v` functionality. The OP copy + paste
+- [ ] REFACTOR, REFACTOR, REFACTOR! So many cleanup to do 😭
+- [ ] Custom keybindings
+- [ ]  Settings menu
+- [ ]  `ctrl + z` UNDO functionality.
+
+# OLD DEMOS
+<p align="center">
+<img src="Docs/OldOverview.gif" alt="Simple showcase Gif" title="Simple Showcase Gif" width="700"/>
+<p align="center">Overview of the project using Warp</p>
+</p>
+<p align="center">
+<img src="Docs/Warp-StepWriter.png" alt="Simple showcase Gif" title="Simple Showcase Gif" width="700"/>
+<p align="center">Overview of the project using Warp</p>
+</p>
