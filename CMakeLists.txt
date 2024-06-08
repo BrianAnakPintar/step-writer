@@ -1,8 +1,11 @@
+
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
-project(step-writer LANGUAGES CXX)
+project(step-writer LANGUAGES CXX C)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
 
 include(FetchContent)
 
@@ -31,13 +34,39 @@ add_executable(step-writer
     src/TextFileViewer.cpp
     src/DataFile.cpp
     src/DirectoryFile.cpp
-    src/Tokenizer.cpp
 )
+
+# Add Tree-sitter C++ grammar
+add_library(ts-cpp STATIC
+    third-party/tree-sitter-cpp/src/parser.c
+    third-party/tree-sitter-cpp/src/scanner.c
+)
+
+# Include directories for Tree-sitter C++ grammar
+target_include_directories(ts-cpp PUBLIC
+    third-party/tree-sitter-cpp/src
+)
+
+# Add Tree-sitter library
+add_library(ts-lib STATIC
+    third-party/tree-sitter/lib/src/lib.c
+)
+
+# Include directories for Tree-sitter
+target_include_directories(ts-lib PUBLIC
+    third-party/tree-sitter/lib/include
+    third-party/tree-sitter/lib/src
+)
+
 target_include_directories(step-writer PRIVATE include)
+
+# Link libraries to the main executable
 target_link_libraries(step-writer
     PRIVATE ftxui::screen
     PRIVATE ftxui::dom
     PRIVATE ftxui::component
+    PRIVATE ts-lib
+    PRIVATE ts-cpp
 )
 
 # Enable testing
@@ -49,13 +78,19 @@ add_executable(all-test
     tests/DocumentTest.cpp
     src/Row.cpp
     src/Document.cpp
-    src/Tokenizer.cpp
 )
+
 target_include_directories(all-test PRIVATE include)
+# Link libraries to the test executable
 target_link_libraries(all-test PRIVATE GTest::gtest_main
-                               PRIVATE ftxui::component)
-    
+                               PRIVATE ftxui::component
+                               PRIVATE ts-lib
+                               PRIVATE ts-cpp)
 
 # Include GoogleTest CMake functions
 include(GoogleTest)
 gtest_discover_tests(all-test)
+
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Debug)
+endif()

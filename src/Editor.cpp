@@ -1,7 +1,6 @@
-#include "Editor.h"
+#include "../include/Editor.h"
 #include "Utils.h"
 #include "DirectoryFile.hpp"
-#include "DataFile.hpp"
 
 // TODO: REFACTORING NOTES, APPLY MVC PATTERN.
 

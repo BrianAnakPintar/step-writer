@@ -1,6 +1,5 @@
-#include "../include/Row.h"
-#include "Tokenizer.hpp"
-#include <vector>
+#include "Row.h"
+#include <cstdint>
 
 Row::Row(std::string s) {
     text = s;
@@ -47,34 +46,41 @@ void Row::removeString(int idx) {
     len = text.size();
 }
 
+void Row::add_highlight_item(highlight_item item) {
+  highlight_items.push_back(item);
+}
+
 // Renders with syntax highlighting. Returns an hbox component where texts fill row.
 ftxui::Element Row::Render() {
   using namespace ftxui;
-  Tokenizer& tokenizer = Tokenizer::GetInstance();
-  std::vector<Token> tokens = tokenizer.Tokenize(getText());
-
-  Elements elements; 
-
-  for (const Token& token : tokens) {
-    std::string token_text_with_space = token.text + " ";
-
-    switch (token.type) {
-      case TokenType::Keyword:
-        elements.push_back(ftxui::text(token_text_with_space) | color(Color::SkyBlue1));
-        break;
-      case TokenType::Operator:
-        elements.push_back(ftxui::text(token_text_with_space) | color(Color::IndianRed1));
-        break;
-      case TokenType::Number:
-        elements.push_back(ftxui::text(token_text_with_space) | color(Color::Yellow));
-        break;
-      case TokenType::String:
-        elements.push_back(ftxui::text(token_text_with_space) | color(Color::DarkSeaGreen4));
-        break;
-      default:
-        elements.push_back(ftxui::text(token_text_with_space));
-        break;
+  
+  uint32_t last_index = 0;
+  Elements elements;
+  
+  for (const highlight_item& item : highlight_items) {
+    // Add the part of the string before the highlighted part.
+    uint32_t start = item.h_idx.first;
+    uint32_t end = item.h_idx.second;
+    if (item.h_idx.first > last_index) {
+      elements.push_back(ftxui::text(text.substr(last_index, start - last_index)));
     }
+    // Add the highlighted part.
+    if (item.h_type == highlight_type::String)
+      elements.push_back(ftxui::text(text.substr(start, end - start)) | color(Color::Green));
+    else if (item.h_type == highlight_type::Identifier)
+      elements.push_back(ftxui::text(text.substr(start, end - start)) | color(Color::Blue));
+    else if (item.h_type == highlight_type::Number)
+      elements.push_back(ftxui::text(text.substr(start, end - start)) | color(Color::Red));
+    else if (item.h_type == highlight_type::Keyword)
+      elements.push_back(ftxui::text(text.substr(start, end - start)) | color(Color::Yellow));
+    else if (item.h_type == highlight_type::Comment)
+      elements.push_back(ftxui::text(text.substr(start, end - start)) | color(Color::Grey35));
+
+    last_index = end;
+  }
+  // Add the rest of the string after the last highlighted part.
+  if (last_index < text.size()) {
+    elements.push_back(ftxui::text(text.substr(last_index)));
   }
 
   return hbox(std::move(elements));

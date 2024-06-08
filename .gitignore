@@ -1,6 +1,9 @@
 # Build folder
 /build
 
+# Cache
+.cache
+
 # Prerequisites
 *.d
 
