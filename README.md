@@ -44,10 +44,6 @@ If you have already cloned the project without using the `--recurse-submodules` 
 6. Make the program by running `make`
 7. Finally, run the program `./step-writer` from the build directory.
 
-
-
-Note: I haven't tested how to build in the recent version as I had to manually install tree-sitter. Hopefully the process remains simple for the user. 😔
-
 ### Todo (soo many things to do ;-;)
 - [x] Better file view hierarchy enabling users to see project structures and directory contents.
 - [x] Fix simple line deletion bugs.
