@@ -29,11 +29,22 @@ I am doing this because the remote servers at UBC does not have neovim installed
 I'll try to update this [blog](https://www.brianmoniaga.com/Blog/posts/stepwriter/) which should contain a better documentation and progress of the state of the application. (Though, I have a bad schedule of updating said site.)
 
 # Installation.
-1. Clone the project
-2. Once cloned, create a `build` directory by typing `mkdir build` and go to that directory by running `cd build`
+1. Clone the project using `git clone --recurse-submodules https://github.com/BrianAnakPintar/step-writer.git`
+2. Once cloned go to the `step-writer` folder, create a `build` directory by typing `mkdir build` and go to that directory by running `cd build`
 3. Next, run `cmake ..`
 4. Make the program by running `make`
 5. Finally, run the program `./step-writer` from the build directory.
+
+If you have already cloned the project without using the `--recurse-submodules` flag, then
+1. Clone the project (Assuming it's not already cloned)
+2. Once you have cloned, go into the `step-writer` folder using `cd step-writer`
+3. Run `git submodule update --init --recursive`
+4. Go back to the `step-writer` directory and create a `build` directory by typing `mkdir build` and go to that directory by running `cd build`
+5. Next, run `cmake ..`
+6. Make the program by running `make`
+7. Finally, run the program `./step-writer` from the build directory.
+
+
 
 Note: I haven't tested how to build in the recent version as I had to manually install tree-sitter. Hopefully the process remains simple for the user. 😔
 
