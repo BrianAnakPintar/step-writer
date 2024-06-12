@@ -1,5 +1,7 @@
 #include "Row.h"
 #include <cstdint>
+#include <string>
+#include <vector>
 
 Row::Row(std::string s) {
     text = s;
@@ -8,6 +10,10 @@ Row::Row(std::string s) {
 
 Row::Row() {
     len = 0;
+}
+
+std::vector<highlight_item> Row::getHighlights() {
+  return highlight_items;
 }
 
 std::string Row::getText() {
@@ -50,13 +56,17 @@ void Row::add_highlight_item(highlight_item item) {
   highlight_items.push_back(item);
 }
 
+void Row::clear_highlights() {
+  highlight_items.clear();
+}
+
 // Renders with syntax highlighting. Returns an hbox component where texts fill row.
 ftxui::Element Row::Render() {
   using namespace ftxui;
-  
+
   uint32_t last_index = 0;
   Elements elements;
-  
+
   for (const highlight_item& item : highlight_items) {
     // Add the part of the string before the highlighted part.
     uint32_t start = item.h_idx.first;

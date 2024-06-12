@@ -36,6 +36,8 @@ public:
     void appendRow(Row r);
     ftxui::Element Render();
     void add_highlight_item(highlight_item item);
+    void clear_highlights();
+    std::vector<highlight_item> getHighlights();
 
 private:
     std::string text;

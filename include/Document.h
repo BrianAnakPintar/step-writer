@@ -16,13 +16,13 @@ private:
   std::string file_path;
   bool dirty;
   std::vector<Row> rows;
-  void NewRow(int posY);
   std::string toString();
   uint32_t charCount();
   TSParser *parser;
   TSTree *tree;
   void highlightSyntax(TSNode node);
-
+  void updateSyntaxHighlightVector(TSTree* old_tree);
+  uint32_t GetByteOffset(uint32_t row, uint32_t column); 
 
 public:
   Document(const std::string &path);
