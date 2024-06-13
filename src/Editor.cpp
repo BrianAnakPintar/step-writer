@@ -14,8 +14,6 @@ File* Editor::ListFiles(const std::string& path) {
     return project_file;
 }
 
-std::string msg = "Use the button the left to open";
-
 void Editor::OpenFile(std::vector<std::string> files, int idx, std::string& base_path) {
     // TODO Check if it's a directory. If so, then populate the collapsible. Otherwise open the file.
 

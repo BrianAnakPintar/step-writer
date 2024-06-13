@@ -45,7 +45,7 @@ ftx::Element TextFileViewer::Render() {
     using namespace ftx;
     Elements elements;
 
-    elements.push_back(text(std::to_string(cursorX) + ", " + std::to_string(cursorY)));
+    // elements.push_back(text(std::to_string(cursorX) + ", " + std::to_string(cursorY)));
     numPadding = std::to_string(document.GetRowsLength()).size(); // Get the length of the longest line number.
     int viewportEnd = std::min(viewportStart + GetBottomY() + 1, static_cast<int>(document.GetRowsLength()));
 
@@ -134,7 +134,7 @@ bool TextFileViewer::InsertModeInputHandler(ftxui::Event event) {
     }
     else if (event == ftxui::Event::Return) {
         Editor& editor = Editor::GetInstance();
-        document.ReturnKey(cursorX - 1, cursorY + viewportStart);
+        document.ReturnKey(cursorX, cursorY + viewportStart);
         cursorY++;
         cursorX = 0;    // Should include an "Indentation Level in Row."
     }

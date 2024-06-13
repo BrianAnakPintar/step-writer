@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <string>
 #include <utility>
 #include "Document.h"
 #include "Row.h"
@@ -210,7 +211,7 @@ TEST(DocumentTest, ReturnKey)
   Document doc(filePath);
   EXPECT_EQ(doc.GetRowsLength(), 6);
   
-  doc.ReturnKey(-1, 4);
+  doc.ReturnKey(0, 4);
   EXPECT_EQ(doc.GetRowsLength(), 7);
 
   Row r1 = doc.GetRows()[0];
@@ -242,16 +243,18 @@ TEST(DocumentTest, ReturnKey)
   EXPECT_EQ(r4.getHighlights()[4].h_idx, std::make_pair(37, 41));
  
   Row r5 = doc.GetRows()[4];
+  EXPECT_EQ(r5.getText(), "");
   EXPECT_EQ(r5.getLen(), 0);
   EXPECT_EQ(r5.getHighlights().size(), 0);
-  
-  EXPECT_EQ(r5.getHighlights()[0].h_type, highlight_type::Keyword);
-  EXPECT_EQ(r5.getHighlights()[0].h_idx, std::make_pair(2, 5));
-  EXPECT_EQ(r5.getHighlights()[1].h_type, highlight_type::Identifier);
-  EXPECT_EQ(r5.getHighlights()[1].h_idx, std::make_pair(6, 7));
-  EXPECT_EQ(r5.getHighlights()[2].h_type, highlight_type::Number);
-  EXPECT_EQ(r5.getHighlights()[2].h_idx, std::make_pair(10, 12));
 
-
+  Row r6 = doc.GetRows()[5];
+  EXPECT_EQ(r6.getText(), "  int x = 10;");
+  EXPECT_EQ(r6.getHighlights().size(), 3);
+  EXPECT_EQ(r6.getHighlights()[0].h_type, highlight_type::Keyword);
+  EXPECT_EQ(r6.getHighlights()[0].h_idx, std::make_pair(2, 5));
+  EXPECT_EQ(r6.getHighlights()[1].h_type, highlight_type::Identifier);
+  EXPECT_EQ(r6.getHighlights()[1].h_idx, std::make_pair(6, 7));
+  EXPECT_EQ(r6.getHighlights()[2].h_type, highlight_type::Number);
+  EXPECT_EQ(r6.getHighlights()[2].h_idx, std::make_pair(10, 12));
 }
 

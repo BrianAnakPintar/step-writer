@@ -70,19 +70,14 @@ void Document::Insert(int posX, int posY, char c) {
   rows[posY].insertText(posX, c);
 
   TSInputEdit edit;
-  uint32_t start_byte = 0;
-  for (uint32_t i = 0; i < posY; i++) {
-    start_byte += rows[i].getLen();
-  }
-  start_byte += (uint32_t) posX;
-
+  uint32_t start_byte = GetByteOffset(posY, posX);
   edit.start_byte = start_byte;
-  edit.old_end_byte = start_byte;
-  edit.new_end_byte = start_byte + 1;
+  edit.old_end_byte = start_byte + 1;
+  edit.new_end_byte = start_byte + 2;
 
   edit.start_point = {(uint32_t) posY, (uint32_t) posX};
-  edit.old_end_point = {(uint32_t) posY, (uint32_t) posX};
-  edit.new_end_point = {(uint32_t) posY, (uint32_t) posX+1};
+  edit.old_end_point = {(uint32_t) posY, (uint32_t) posX + 1};
+  edit.new_end_point = {(uint32_t) posY, (uint32_t) posX + 2};
   ts_tree_edit(tree, &edit);
   updateSyntaxHighlightVector(tree);
 }
@@ -98,11 +93,13 @@ uint32_t Document::GetByteOffset(uint32_t row, uint32_t column) {
 }
 
 void Document::Delete(int posX, int posY) {
+  dirty = true;
   if (posX < 0) {
     // If delete at beginning.
     if (posY > 0) {
       uint32_t prev_line_byte = GetByteOffset(posY, 0); 
       uint32_t prev_line_size = rows[posY-1].getLen();
+      
       rows[posY - 1].appendRow(rows[posY]);
       rows.erase(rows.begin() + posY);
       
@@ -122,17 +119,13 @@ void Document::Delete(int posX, int posY) {
   rows[posY].deleteChar(posX);
   // TODO: TSInputEdit here.
   TSInputEdit edit;
-  uint32_t start_byte = 0;
-  for (uint32_t i = 0; i < posY; i++) {
-    start_byte += rows[i].getLen();
-  }
-  start_byte += (uint32_t)posX;
+  uint32_t start_byte = GetByteOffset(posY, posX);
 
-  edit.start_byte = start_byte;
+  edit.start_byte = start_byte - 1;
   edit.old_end_byte = start_byte + 1;
   edit.new_end_byte = start_byte;
 
-  edit.start_point = {(uint32_t)posY, (uint32_t)posX};
+  edit.start_point = {(uint32_t)posY, (uint32_t)posX - 1};
   edit.old_end_point = {(uint32_t)posY, (uint32_t)posX + 1};
   edit.new_end_point = {(uint32_t)posY, (uint32_t)posX};
   ts_tree_edit(tree, &edit);
@@ -140,24 +133,26 @@ void Document::Delete(int posX, int posY) {
 }
 
 void Document::ReturnKey(int posX, int posY) {
-  Row r = rows[posY];
-  rows[posY].removeString(posX + 1);
-  std::string afterText = r.getText().substr(posX + 1);
+  dirty = true;
+  Row& r = rows[posY];
+  std::string beforeText = r.getText().substr(0, posX);
+  std::string afterText = r.getText().substr(posX);
+  r = Row(beforeText);
   Row row(afterText);
   rows.insert(rows.begin() + posY + 1, row);
   
-  uint32_t start_byte = GetByteOffset(posY, posX + 1); // Assuming getByteOffset gives the byte position of posX+1 in the row
+  uint32_t start_byte = GetByteOffset(posY, posX); // Assuming getByteOffset gives the byte position of posX+1 in the row
   uint32_t old_end_byte = start_byte + afterText.size();
-  uint32_t new_end_byte = start_byte; // No characters after posX+1 in the original row
+  uint32_t new_end_byte = start_byte + afterText.size() + 1; // No characters after posX+1 in the original row
 
   // Define the input edit
   TSInputEdit edit = {};
   edit.start_byte = start_byte;
   edit.old_end_byte = old_end_byte;
   edit.new_end_byte = new_end_byte;
-  edit.start_point = {(uint32_t)posY, static_cast<uint32_t>(posX + 1)};
-  edit.old_end_point = {(uint32_t)posY, static_cast<uint32_t>(r.getText().size())};
-  edit.new_end_point = {(uint32_t)posY + 1, 0};
+  edit.start_point = {(uint32_t)posY, static_cast<uint32_t>(posX)};
+  edit.old_end_point = {(uint32_t)posY, static_cast<uint32_t>(r.getLen() + afterText.size())};
+  edit.new_end_point = {(uint32_t)posY + 1, static_cast<uint32_t>(afterText.size())};
 
   ts_tree_edit(tree, &edit);
   updateSyntaxHighlightVector(tree);
@@ -201,7 +196,7 @@ void Document::highlightSyntax(TSNode node) {
     highlight_item item = {idx_pair, highlight_type::String};
     rows[start_point.row].add_highlight_item(item);
 
-  } else if (node_type == "identifier") {
+  } else if (node_type == "identifier" || node_type == "type_identifier") {
     std::pair<uint32_t, uint32_t> idx_pair(start_point.column, end_point.column);
     highlight_item item = {idx_pair, highlight_type::Identifier};
     rows[start_point.row].add_highlight_item(item);
@@ -251,7 +246,7 @@ void Document::updateSyntaxHighlightVector(TSTree* old_tree) {
   }
   const char *source_code = docString.c_str();
   uint32_t source_code_len = charCount();
-  tree = ts_parser_parse_string(parser, old_tree, source_code, source_code_len);
+  tree = ts_parser_parse_string(parser, NULL, source_code, source_code_len);
   TSNode root = ts_tree_root_node(tree);
 
   highlightSyntax(root);
