@@ -2,6 +2,7 @@
 #include "Editor.h"
 #include "ftxui/component/event.hpp"
 #include "ftxui/screen/screen.hpp"
+#include <string>
 
 TextFileViewer::TextFileViewer(const std::string& file_path) : file_path(file_path) {
     Editor& editor = Editor::GetInstance();
@@ -44,6 +45,7 @@ ftx::Element TextFileViewer::Render() {
     using namespace ftx;
     Elements elements;
 
+    elements.push_back(text(std::to_string(cursorX) + ", " + std::to_string(cursorY)));
     numPadding = std::to_string(document.GetRowsLength()).size(); // Get the length of the longest line number.
     int viewportEnd = std::min(viewportStart + GetBottomY() + 1, static_cast<int>(document.GetRowsLength()));
 

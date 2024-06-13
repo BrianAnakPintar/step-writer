@@ -202,3 +202,56 @@ TEST(DocumentTest, DeleteFirstLine)
   EXPECT_EQ(r4.getHighlights().size(), 0);
 }
 
+TEST(DocumentTest, ReturnKey)
+{
+  std::filesystem::path dirPath = std::filesystem::path(__FILE__).remove_filename();
+  std::filesystem::path filePath = dirPath /= "DocumentTestFiles/multi-line.cpp";
+    
+  Document doc(filePath);
+  EXPECT_EQ(doc.GetRowsLength(), 6);
+  
+  doc.ReturnKey(-1, 4);
+  EXPECT_EQ(doc.GetRowsLength(), 7);
+
+  Row r1 = doc.GetRows()[0];
+  EXPECT_EQ(r1.getHighlights().size(), 1);
+  EXPECT_EQ(r1.getHighlights()[0].h_type, highlight_type::String);
+  EXPECT_EQ(r1.getHighlights()[0].h_idx, std::make_pair(9, 19));
+
+  Row r2 = doc.GetRows()[1];
+  EXPECT_EQ(r2.getHighlights().size(), 0);
+
+  Row r3 = doc.GetRows()[2];
+  EXPECT_EQ(r3.getHighlights().size(), 2);
+  EXPECT_EQ(r3.getHighlights()[0].h_type, highlight_type::Keyword);
+  EXPECT_EQ(r3.getHighlights()[0].h_idx, std::make_pair(0, 3));
+  EXPECT_EQ(r3.getHighlights()[1].h_type, highlight_type::Identifier);
+  EXPECT_EQ(r3.getHighlights()[1].h_idx, std::make_pair(4, 8));
+
+  Row r4 = doc.GetRows()[3];
+  EXPECT_EQ(r4.getHighlights().size(), 5);
+  EXPECT_EQ(r4.getHighlights()[0].h_type, highlight_type::Keyword);
+  EXPECT_EQ(r4.getHighlights()[0].h_idx, std::make_pair(2, 5));
+  EXPECT_EQ(r4.getHighlights()[1].h_type, highlight_type::Identifier);
+  EXPECT_EQ(r4.getHighlights()[1].h_idx, std::make_pair(7, 11));
+  EXPECT_EQ(r4.getHighlights()[2].h_type, highlight_type::String);
+  EXPECT_EQ(r4.getHighlights()[2].h_idx, std::make_pair(15, 28));
+  EXPECT_EQ(r4.getHighlights()[3].h_type, highlight_type::Keyword);
+  EXPECT_EQ(r4.getHighlights()[3].h_idx, std::make_pair(32, 35));
+  EXPECT_EQ(r4.getHighlights()[4].h_type, highlight_type::Identifier);
+  EXPECT_EQ(r4.getHighlights()[4].h_idx, std::make_pair(37, 41));
+ 
+  Row r5 = doc.GetRows()[4];
+  EXPECT_EQ(r5.getLen(), 0);
+  EXPECT_EQ(r5.getHighlights().size(), 0);
+  
+  EXPECT_EQ(r5.getHighlights()[0].h_type, highlight_type::Keyword);
+  EXPECT_EQ(r5.getHighlights()[0].h_idx, std::make_pair(2, 5));
+  EXPECT_EQ(r5.getHighlights()[1].h_type, highlight_type::Identifier);
+  EXPECT_EQ(r5.getHighlights()[1].h_idx, std::make_pair(6, 7));
+  EXPECT_EQ(r5.getHighlights()[2].h_type, highlight_type::Number);
+  EXPECT_EQ(r5.getHighlights()[2].h_idx, std::make_pair(10, 12));
+
+
+}
+

@@ -141,22 +141,23 @@ void Document::Delete(int posX, int posY) {
 
 void Document::ReturnKey(int posX, int posY) {
   Row r = rows[posY];
-  uint32_t eol = rows[posY].getLen();
-  uint32_t start_byte = GetByteOffset(posY, posX);
   rows[posY].removeString(posX + 1);
   std::string afterText = r.getText().substr(posX + 1);
   Row row(afterText);
   rows.insert(rows.begin() + posY + 1, row);
   
-  // Update Tree-sitter parse tree
-  TSInputEdit edit;
+  uint32_t start_byte = GetByteOffset(posY, posX + 1); // Assuming getByteOffset gives the byte position of posX+1 in the row
+  uint32_t old_end_byte = start_byte + afterText.size();
+  uint32_t new_end_byte = start_byte; // No characters after posX+1 in the original row
+
+  // Define the input edit
+  TSInputEdit edit = {};
   edit.start_byte = start_byte;
-  edit.old_end_byte = start_byte;  // No text is deleted
-  edit.new_end_byte = GetByteOffset(posY+1, posX+1); // Adding one byte for the newline character
-  
-  edit.start_point = {static_cast<uint32_t>(posY), static_cast<uint32_t>(posX)};
-  edit.old_end_point = {static_cast<uint32_t>(posY), static_cast<uint32_t>(posX + 1)};
-  edit.new_end_point = {static_cast<uint32_t>(posY + 1), 0};
+  edit.old_end_byte = old_end_byte;
+  edit.new_end_byte = new_end_byte;
+  edit.start_point = {(uint32_t)posY, static_cast<uint32_t>(posX + 1)};
+  edit.old_end_point = {(uint32_t)posY, static_cast<uint32_t>(r.getText().size())};
+  edit.new_end_point = {(uint32_t)posY + 1, 0};
 
   ts_tree_edit(tree, &edit);
   updateSyntaxHighlightVector(tree);

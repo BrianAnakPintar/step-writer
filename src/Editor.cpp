@@ -1,6 +1,7 @@
 #include "../include/Editor.h"
 #include "Utils.h"
 #include "DirectoryFile.hpp"
+#include <ftxui/screen/string.hpp>
 
 // TODO: REFACTORING NOTES, APPLY MVC PATTERN.
 
@@ -36,7 +37,6 @@ ftxui::Component ModalComponent(std::function<void()> do_nothing,
                                 std::function<void()> hide_modal) {
     using namespace ftxui;
     auto component = Container::Vertical({
-        Button("Do nothing", do_nothing),
         Button("Quit modal", hide_modal),
     });
     // Polish how the two buttons are rendered:
