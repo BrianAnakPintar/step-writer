@@ -22,11 +22,19 @@ I am doing this because the remote servers at UBC does not have neovim installed
 - File Explorer navigation with collapsible tabs.
 - Status Bar indicating the mode (INSERT, NORMAL, VISUAL)
 <p align="center">
-<img src="Docs/Screenshot.png" alt="Simple showcase Gif" title="Simple Image" width="700"/>
+<img src="Docs/Demo1.png" alt="Simple showcase Gif" title="Simple Image" width="700"/>
 <p align="center">Figure 1. Overview of the project using Wezterm</p>
 </p>
 
 I'll try to update this [blog](https://www.brianmoniaga.com/Blog/posts/stepwriter/) which should contain a better documentation and progress of the state of the application. (Though, I have a bad schedule of updating said site.)
+
+Below, you can see this editor editing it's own source code as per the tradition!
+
+<p align="center">
+<img src="Docs/Demo.gif" alt="Source code Gif" title="Simple Image" width="700"/>
+<p align="center">Figure 2. Editing it's own source code.</p>
+</p>
+
 
 # Installation.
 1. Clone the project using `git clone --recurse-submodules https://github.com/BrianAnakPintar/step-writer.git`
@@ -49,10 +57,12 @@ If you have already cloned the project without using the `--recurse-submodules` 
 - [x] Fix simple line deletion bugs.
 - [ ] A working terminal.
 - [ ] Better cursor movement.
-- [ ] Syntax Highlighting (Sort of).
+- [x] Syntax Highlighting (Sort of).
   - [x] Basic syntax highlighting.
   - [ ] Implement colors for ALL types.
   - [ ] Update syntax tree when user inputs a line.
+  - [ ] Use TSCursor for movement
+  - [ ] Use TSInputEdit changing existing tree rather than reparsing everything from scratch.
 - [ ] Use a ~~rope~~ gap buffer data structure.
 - [ ] Search functionality
 - [ ] `ctrl + c` and `ctrl + v` functionality. The OP copy + paste
@@ -68,9 +78,14 @@ it is a very cool TUI library that anyone planning to make a TUI application in 
 # OLD DEMOS
 <p align="center">
 <img src="Docs/Overview.gif" alt="Simple showcase Gif" title="Simple Showcase Gif" width="700"/>
-<p align="center">Overview of the project using Warp</p>
 </p>
 <p align="center">
 <img src="Docs/Warp-StepWriter.png" alt="Simple showcase Gif" title="Simple Showcase Gif" width="700"/>
-<p align="center">Overview of the project using Warp</p>
+</p>
+<p align="center">
+<img src="Docs/Home-Screen.png" alt="Home Screen" title="Simple Showcase Gif" width="700"/>
+</p>
+<p align="center">
+<img src="Docs/BUGS.gif" alt="BUGS" title="Simple Showcase Gif" width="700"/>
+<p align="center">Video of trying to implement syntax higlighting, encountering indexing bugs.</p>
 </p>
