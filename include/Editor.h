@@ -50,7 +50,7 @@ public:
     void OpenFileEditor(const std::string &path);
 
     // The first function called, the point of entry.
-    void StartApplication();
+    void StartApplication(std::string &path);
 
     // Constructor for an empty project.
     Editor(const Editor&) = delete;

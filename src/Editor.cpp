@@ -2,6 +2,7 @@
 #include "Utils.h"
 #include "DirectoryFile.hpp"
 #include <ftxui/screen/string.hpp>
+#include <string>
 
 // TODO: REFACTORING NOTES, APPLY MVC PATTERN.
 
@@ -16,7 +17,6 @@ File* Editor::ListFiles(const std::string& path) {
 
 void Editor::OpenFile(std::vector<std::string> files, int idx, std::string& base_path) {
     // TODO Check if it's a directory. If so, then populate the collapsible. Otherwise open the file.
-
     std::string fileName = base_path + "/" + files[idx];
     tfv->UpdateDocument(fileName);
 }
@@ -56,7 +56,7 @@ bool Editor::SanityChecks(ftxui::Event event) {
             if (tfv->isDirty()) {
                 if (tfv->SaveFile())
                     editorStateInt = 0;
-            }  
+            }
             return true;
         }
     }
@@ -64,7 +64,7 @@ bool Editor::SanityChecks(ftxui::Event event) {
     return false;
 }
 
-void Editor::StartApplication() {
+void Editor::StartApplication(std::string &path) {
     using namespace ftxui;
     Elements elements;
 
@@ -92,12 +92,12 @@ void Editor::StartApplication() {
 
 
     // For Main Editor.
-    char buffer[FILENAME_MAX];
-    getcwd(buffer, FILENAME_MAX);
-    std::string currentDirectory(buffer);
+    // char buffer[FILENAME_MAX];
+    // getcwd(buffer, FILENAME_MAX);
+    // std::string currentDirectory(buffer);
 
     // Access the parent directory
-    fs::path parentPath = fs::path(currentDirectory).parent_path();
+    fs::path parentPath = fs::path(path).parent_path();
     // parentPath /= "src";
 
     std::string parentDir = parentPath.string();
