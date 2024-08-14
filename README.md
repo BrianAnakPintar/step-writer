@@ -50,7 +50,7 @@ If you have already cloned the project without using the `--recurse-submodules` 
 4. Go back to the `step-writer` directory and create a `build` directory by typing `mkdir build` and go to that directory by running `cd build`
 5. Next, run `cmake ..`
 6. Make the program by running `make`
-7. Finally, run the program `./step-writer` from the build directory.
+7. Finally, run the program `./step-writer <path>` from the build directory.
 
 ### Todo (soo many things to do ;-;)
 - [x] Better file view hierarchy enabling users to see project structures and directory contents.
