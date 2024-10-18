@@ -35,6 +35,7 @@ private:
     // Private Functions
     File* ListFiles(const std::string& path);
     void StartMenuUI();
+    // Opens a file
     void OpenFile(std::vector<std::string> files, int idx, std::string& base_path);
 
     bool SanityChecks(ftxui::Event event);
