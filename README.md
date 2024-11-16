@@ -41,7 +41,7 @@ Below, you can see this editor editing it's own source code as per the tradition
 2. Once cloned go to the `step-writer` folder, create a `build` directory by typing `mkdir build` and go to that directory by running `cd build`
 3. Next, run `cmake ..`
 4. Make the program by running `make`
-5. Finally, run the program `./step-writer` from the build directory.
+5. Finally, run the program `./step-writer <path>` from the build directory.
 
 If you have already cloned the project without using the `--recurse-submodules` flag, then
 1. Clone the project (Assuming it's not already cloned)
