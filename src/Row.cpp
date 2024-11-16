@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 
+
 Row::Row(std::string s) {
     text = s;
     len = s.size();

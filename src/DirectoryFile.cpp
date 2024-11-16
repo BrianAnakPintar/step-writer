@@ -4,25 +4,6 @@
 
 DirectoryFile::DirectoryFile(const std::string& name, const std::string& path) : File(name, path, FileType::Directory) {}
 
-// bool DirectoryFile::OpenFile() {
-//     namespace fs = std::filesystem;
-
-//     // Assuming file_path is a std::string containing the path to the directory
-//     for (const auto& entry : fs::directory_iterator(file_path)) {
-//         File *file;
-//         if (entry.is_directory()) {
-//             // Entry is a directory
-//             file = new DirectoryFile(entry.path().filename().string(), entry.path().string());
-//             file->OpenFile();   // Just for funsies, fill the tree.
-//         } else {
-//             // Entry is not a directory
-//             file = new DataFile(entry.path().filename().string(), entry.path().string());
-//         }
-//         child.push_back(file);
-//     }
-//     return 1;
-// }
-
 bool DirectoryFile::OpenFile() {
     namespace fs = std::filesystem;
 
@@ -44,7 +25,7 @@ bool DirectoryFile::OpenFile() {
         }
     }
     
-    return true;
+    return true; 
 }
 
 

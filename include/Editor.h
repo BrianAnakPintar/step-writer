@@ -22,6 +22,7 @@ private:
         Workspace,
         Settings
     };
+
     EditorState editorState;
     int editorStateInt; // Redundant but lets just see if it works.
 
@@ -32,9 +33,12 @@ private:
     TextFileViewer *tfv;
     ftxui::Component mainScreen;
 
-    // Private Functions
+    // Private Functions:
+    
+    // List files in a directory
     File* ListFiles(const std::string& path);
     void StartMenuUI();
+    // Opens a file
     void OpenFile(std::vector<std::string> files, int idx, std::string& base_path);
 
     bool SanityChecks(ftxui::Event event);

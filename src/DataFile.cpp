@@ -1,9 +1,7 @@
 #include "DataFile.hpp"
 #include "Editor.h"
 
-DataFile::DataFile(const std::string& name, const std::string& path) : File(name, path, FileType::Data) {
-
-}
+DataFile::DataFile(const std::string& name, const std::string& path) : File(name, path, FileType::Data) {}
 
 bool DataFile::OpenFile() {
     // Actually we don't have to implement this to make it work.
