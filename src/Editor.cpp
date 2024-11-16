@@ -1,6 +1,7 @@
 #include "../include/Editor.h"
 #include "Utils.h"
 #include "DirectoryFile.hpp"
+#include <filesystem>
 #include <ftxui/screen/string.hpp>
 #include <string>
 
@@ -54,9 +55,9 @@ bool Editor::SanityChecks(ftxui::Event event) {
     if (editorState == Workspace) {
         if (event == ftxui::Event::Special({16})) {   // If Ctrl + P is pressed
             if (tfv->isDirty()) {
-                if (tfv->SaveFile())
-                    editorStateInt = 0;
+                tfv->SaveFile();  // Perhaps could improve by writing some check.
             }
+            editorStateInt = 0;
             return true;
         }
     }
@@ -75,7 +76,8 @@ void Editor::StartApplication(std::string &path) {
 
     auto buttons = Container::Vertical({
         Button("Open File", [&] {HomeButton(0);}, CustomButton()) | center,
-        Button("Settings", [&] {HomeButton(1);}, CustomButton()) | center,
+        // Comment for now until this is implemented.
+        /*Button("Settings", [&] {HomeButton(1);}, CustomButton()) | center,*/
         Button("Quit", [&] {HomeButton(2);}, CustomButton()) | center,
         
     });
@@ -92,17 +94,23 @@ void Editor::StartApplication(std::string &path) {
 
 
     // For Main Editor.
-    // char buffer[FILENAME_MAX];
-    // getcwd(buffer, FILENAME_MAX);
-    // std::string currentDirectory(buffer);
-
     // Access the parent directory
-    fs::path parentPath = fs::path(path).parent_path();
-    // parentPath /= "src";
+    
+    fs::path fspath(path);
+    std::string targetPath;
+    if (fs::exists(fspath)) {
+        if (fs::is_regular_file(fspath))
+            targetPath = fspath.parent_path().string();
+        else if (fs::is_directory(fspath))
+            targetPath = fspath.string();
+        else
+            targetPath = fspath.parent_path().string(); // Unsure when this is the case.
+    } else {
+        std::cerr << "invalid path" << std::endl;
+        return;
+    }
 
-    std::string parentDir = parentPath.string();
-
-    File* root = ListFiles(parentDir);
+    File* root = ListFiles(targetPath);
 
     auto x = ftxui::Container::Vertical({});
 
