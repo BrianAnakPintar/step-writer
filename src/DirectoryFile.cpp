@@ -1,33 +1,18 @@
 #include "DirectoryFile.hpp"
 #include "DataFile.hpp"
 #include <filesystem>
+#include <memory>
 
-DirectoryFile::DirectoryFile(const std::string& name, const std::string& path) : File(name, path, FileType::Directory) {}
+DirectoryFile::DirectoryFile(const std::string& name, const std::string& path) 
+    : File(name, path, FileType::Directory), 
+      lazyLoader(std::make_unique<LazyLoader>(path)) {}
+
+DirectoryFile::~DirectoryFile() = default;
 
 bool DirectoryFile::OpenFile() {
-    namespace fs = std::filesystem;
-
-    // Assuming file_path is a std::string containing the path to the directory
-    // First, iterate over directories
-    for (const auto& entry : fs::directory_iterator(file_path)) {
-        if (entry.is_directory()) {
-            DirectoryFile* directory = new DirectoryFile(entry.path().filename().string(), entry.path().string());
-            directory->OpenFile();   // Just for funsies, fill the tree.
-            child.push_back(directory);
-        }
-    }
-    
-    // Then, iterate over files
-    for (const auto& entry : fs::directory_iterator(file_path)) {
-        if (!entry.is_directory()) {
-            DataFile* file = new DataFile(entry.path().filename().string(), entry.path().string());
-            child.push_back(file);
-        }
-    }
-    
+    // No longer pre-loading all children
     return true; 
 }
-
 
 ftxui::Component Inner(std::vector<ftxui::Component> children) {
     using namespace ftxui;
@@ -42,13 +27,19 @@ ftxui::Component Inner(std::vector<ftxui::Component> children) {
 
 ftxui::Component DirectoryFile::RenderTree() {
     using namespace ftxui;
-    std::vector<ftxui::Component> components;
+    
+    // Lazy loading of children when the collapsible is expanded
+    return Collapsible(file_name, Renderer([this] {
+        std::vector<ftxui::Component> components;
+        
+        // Load children only when rendering
+        lazyLoader->LoadChildren(child);
+        
+        for (auto& f : child) {
+            auto cmp = f->RenderTree();
+            components.push_back(cmp);
+        }
 
-    for (auto& f : child) {
-        auto cmp = f->RenderTree();
-        components.push_back(cmp);
-    }
-
-    auto container = Collapsible(file_name, Inner(std::move(components))); // Move components vector when constructing Inner.
-    return container;
+        return Inner(std::move(components))->Render();
+    }));
 }

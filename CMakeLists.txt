@@ -79,6 +79,7 @@ add_executable(step-writer
     src/TextFileViewer.cpp
     src/DataFile.cpp
     src/DirectoryFile.cpp
+    src/LazyLoader.cpp
 )
 
 target_include_directories(step-writer PRIVATE include)
