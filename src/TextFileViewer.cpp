@@ -167,10 +167,12 @@ void TextFileViewer::UpdateCursor() {
     auto& editor = Editor::GetInstance();
 
     // Bad structure but screw it... Bounds Check for line
-    int line_size = document.GetRows()[cursorY + viewportStart].getLen();
-    if (cursorY + viewportStart > document.GetRowsLength() - 1)
+    if (cursorY + viewportStart > document.GetRowsLength() - 1) {
         cursorY = std::min(document.GetRowsLength() - 1, GetBottomY());
-    if (cursorX > line_size) {
+    }
+
+    if (auto line_size = document.GetRows()[cursorY].getLen();
+        cursorX > line_size) {
         cursorX = line_size;
     }
 
